@@ -1,59 +1,39 @@
-const {app, BrowserWindow, Menu,Notification} = require('electron')
+const {app, BrowserWindow, Menu, ipcMain} = require('electron')
 const path = require('path')
 const url = require('url')
 
 // 保持一个对于 window 对象的全局引用，如果你不这样做，
 // 当 JavaScript 对象被垃圾回收， window 会被自动地关闭
-let win,win2
+let mainWin;
 
 function createWindow () {
-  const template = [
-    {
-      role: 'window',
-      submenu: [
-        {role: 'minimize'},
-        {role: 'close'}
-      ]
-    },
-    {
-      role: 'help',
-      submenu: [
-        {
-          label: 'Learn More',
-          click () { require('electron').shell.openExternal('https://electron.atom.io') }
-        }
-      ]
-    }
-  ]
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-
-
   // 创建浏览器窗口。
-  win = new BrowserWindow({
+  mainWin = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: false,
+    transparent: true,
     webPreferences: {
       nodeIntegration: true
     }
   })
 
   // 然后加载应用的 index.html。
-  win.loadURL(url.format({
+  mainWin.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
 
   // 打开开发者工具。
-  win.webContents.openDevTools();
+  mainWin.webContents.openDevTools();
 
   // 当 window 被关闭，这个事件会被触发。
-  win.on('closed', () => {
+  mainWin.on('closed', () => {
     // 取消引用 window 对象，如果你的应用支持多窗口的话，
     // 通常会把多个 window 对象存放在一个数组里面，
     // 与此同时，你应该删除相应的元素。
-    win = null
+    mainWin = null
   })
 }
 
@@ -74,7 +54,15 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // 在macOS上，当单击dock图标并且没有其他窗口打开时，
   // 通常在应用程序中重新创建一个窗口。
-  if (win === null) {
+  if (mainWin === null) {
     createWindow()
   }
 })
+
+ipcMain.on('resetWindowSize', (event, size) => {
+  mainWin.setSize(size.width, size.height);
+});
+
+ipcMain.on('switch_min', (event, arg) => {
+  (mainWin.isMinimized()) ? mainWin.restore() : mainWin.minimize();
+});

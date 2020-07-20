@@ -6,10 +6,12 @@ body {
 }
 
 .container {
-    position: relative;
+    position: absolute;
     overflow-y:scroll;
-    height: 100%;
-    width: 100%;
+    top: 30px;
+    right: 0px;
+    left:0px;
+    bottom: 0px;
 }
 
 .player {
@@ -17,3 +19,64 @@ body {
     margin: 20px;
     background: #2ecc71;
 }
+
+.bottom {
+    position: relative;
+    margin: 20px;
+    height: 20%;
+}
+
+
+.header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 75px;
+    opacity: 1;
+    z-index: 3;
+    height: 30px;
+    -webkit-app-region: drag;
+}
+
+.window_btns {
+    position: absolute;
+    top: 0px;
+    right: -75px;
+    height: 30px;
+    display: flex;
+    z-index: 4;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+.win_btn {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+}
+.win_btn:hover {
+    background-position: -20px 0px;
+}
+.min_btn {
+    background-image: url("./png/min.png");
+}
+.max_btn {
+    background-image: url("./png/max.png");
+}
+.close_btn {
+    background-image: url("./png/close.png");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

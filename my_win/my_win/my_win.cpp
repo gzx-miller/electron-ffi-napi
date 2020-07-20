@@ -25,7 +25,6 @@ void sprintLog(const char *format, ...) {
 
 DLL_API bool create_win(int x, int y, int w, int h) {
     sprintLog("create_win: %d,%d,%d,%d \r\n", x, y, w, h);
-
     return true;
 }
 

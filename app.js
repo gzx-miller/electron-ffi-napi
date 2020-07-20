@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron');
+
 function test_ffi_napi() {
   try {
     let ffi = require("ffi-napi");
@@ -13,25 +15,20 @@ function test_ffi_napi() {
     console.error("[err] ffi.Library:", error);
   }
 
-  ffi_napi.create_win(100, 100, 300, 200);
-  ffi_napi.set_win_pos(200, 200);
-  ffi_napi.set_win_size(800, 600);
+  // ffi_napi.create_win(100, 100, 300, 200);
+  // ffi_napi.set_win_pos(200, 200);
+  // ffi_napi.set_win_size(800, 600);
   //ffi_napi.quit_win();
 }
 
-window.onload = () => {
-  test_ffi_napi();
-
+function observePlayerSize() {  
   var body = document.getElementsByTagName("body")[0];
-  var player1 = document.getElementById("player1");
-  var player2 = document.getElementById("player2");
+  var player = document.getElementById("player");
   window.onresize = () =>{
     body.style.width = window.innerWidth + "px";
     body.style.height = window.innerHeight + "px";
-    player1.style.width = window.innerWidth / 2 + "px";
-    player1.style.height = window.innerHeight / 2 + "px";
-    player2.style.width = window.innerWidth / 2 + "px";
-    player2.style.height = window.innerHeight / 2 + "px";
+    player.style.width = window.innerWidth * 0.8 + "px";
+    player.style.height = window.innerHeight * 0.8 + "px";
   }
   window.onresize();
 
@@ -42,8 +39,8 @@ window.onload = () => {
 
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
-      console.log(`mutation: ${player1.clientWidth}, ${player1.clientHeight}`);
-      ffi_napi.set_win_size(player1.clientWidth, player1.clientHeight);
+      console.log(`mutation: ${player.clientWidth}, ${player.clientHeight}`);
+      window.ffi_napi.set_win_size(player.clientWidth, player.clientHeight);
     });
   });
   var config = {
@@ -53,5 +50,23 @@ window.onload = () => {
     attributeOldValue: true,
     attributeFilter: ["style"],
   };
-  observer.observe(player1, config);
+  observer.observe(player, config);
+}
+
+function regClick() {
+  document.querySelector('#max_btn').onclick = (e) => {
+    ipcRenderer.send('switch_max', '');
+  };
+  document.querySelector('#min_btn').onclick = () => {
+      ipcRenderer.send('switch_min', '');
+  };
+  document.querySelector('#close_btn').onclick = () => {
+      window.close();
+  };
+}
+
+window.onload = () => {
+  test_ffi_napi();
+  observePlayerSize();
+  regClick();
 };
