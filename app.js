@@ -2,7 +2,7 @@ function test_ffi_napi() {
   try {
     let ffi = require("ffi-napi");
     var ref = require("ref-napi");
-    window.ffi_napi = ffi.Library("my_win/release/my_win.dll", {
+    window.ffi_napi = ffi.Library("my_win/release/little_win.dll", {
       create_win: ["bool", ["int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
@@ -16,7 +16,7 @@ function test_ffi_napi() {
   ffi_napi.create_win(100, 100, 300, 200);
   ffi_napi.set_win_pos(200, 200);
   ffi_napi.set_win_size(800, 600);
-  ffi_napi.quit_win();
+  //ffi_napi.quit_win();
 }
 
 window.onload = () => {

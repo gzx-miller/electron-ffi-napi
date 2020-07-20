@@ -9,7 +9,7 @@ typedef bool(*PF_WH)(int w, int h);
 typedef bool(*PF_quit)();
 
 int main(int argc, char *argv[]) {
-    HINSTANCE handle = (HINSTANCE)LoadLibraryA("my_win.dll");
+    HINSTANCE handle = (HINSTANCE)LoadLibraryA("little_win.dll");
     if (handle == NULL) return -1;
 
     PF_XYWH pf_create_win = (PF_XYWH)GetProcAddress(handle, "create_win");
