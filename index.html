@@ -3,29 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Hello World!</title>
-  <style>
-  </style>
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-  <script>
-    window.onload = function () {
-      try {
-        let ffi = require('ffi-napi');
-        window.ffi_napi = ffi.Library('native/demo.dll', {
-          'add': ['double', ['double', 'double']],
-        })
-        console.log('fii.Library:', ffi_napi);
-      } catch (error) {
-        console.error('ffi.Library:', error);
-      }
+  <div class="container" id="container">
+    <div class="player" id="player1">
+    </div>
+    <div class="player" id="player2">
+    </div>
+</div>
 
-      let v1 = 111;
-      let v2 = 222;
-      let ret = ffi_napi.add(v1, v2);
-      console.log(`${v1}+${v2}=${ret}`);
-    }
+  <script>
+    require("./app.js");
   </script>
 </body>
 

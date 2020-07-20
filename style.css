@@ -1,0 +1,19 @@
+body {
+    position: relative;
+    margin: 0;
+    background: #e6e6e6;
+    overflow: hidden;
+}
+
+.container {
+    position: relative;
+    overflow-y:scroll;
+    height: 100%;
+    width: 100%;
+}
+
+.player {
+    position: relative;
+    margin: 20px;
+    background: #2ecc71;
+}

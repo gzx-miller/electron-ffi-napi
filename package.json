@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder --win --ia32"
   },
   "keywords": [],
   "author": "wzdxy",
@@ -28,6 +28,7 @@
     "electron-builder": "^21.2.0"
   },
   "dependencies": {
-    "ffi-napi": "^2.4.5"
+    "ffi-napi": "^2.4.5",
+    "ref-napi": "^2.0.3"
   }
 }
