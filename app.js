@@ -9,13 +9,14 @@ function test_ffi_napi() {
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
       quit_win: ["bool", []],
+      show_win: ["bool", ["int"]]
     });
     console.log("[init] fii.Library:", ffi_napi);
   } catch (error) {
     console.error("[err] ffi.Library:", error);
   }
 
-  // ffi_napi.create_win(100, 100, 300, 200);
+  ffi_napi.create_win(100, 100, 300, 200);
   // ffi_napi.set_win_pos(200, 200);
   // ffi_napi.set_win_size(800, 600);
   //ffi_napi.quit_win();
@@ -64,6 +65,11 @@ function regClick() {
       window.close();
   };
 }
+
+ipcRenderer.on("show_window", (ev, arg)=>{
+  console.log("on recv show_window:" + JSON.stringify(arg));
+  window.ffi_napi.show_win(arg.show);
+})
 
 window.onload = () => {
   test_ffi_napi();

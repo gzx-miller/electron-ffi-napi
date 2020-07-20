@@ -63,3 +63,9 @@ DLL_API bool quit_win() {
     SDL_Quit();
     return true;
 }
+
+DLL_API bool show_win(int isShow) {
+    sprintLog("show_win: %d \r\n", isShow);
+    isShow? SDL_ShowWindow(sdlWindow): SDL_HideWindow(sdlWindow);
+    return true;
+}
