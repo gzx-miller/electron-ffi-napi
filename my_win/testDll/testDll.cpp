@@ -8,8 +8,10 @@ typedef bool(*PF_XYWH)(int x, int y, int w, int h);
 typedef bool(*PF_WH)(int w, int h);
 typedef bool(*PF_quit)();
 
-int main(int argc, char *argv[]) {
-    HINSTANCE handle = (HINSTANCE)LoadLibraryA("little_win.dll");
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+    LPWSTR lpCmdLine, int nCmdShow) {
+//int main(int argc, char *argv[]) {
+    HINSTANCE handle = (HINSTANCE)LoadLibraryA("my_win.dll");
     if (handle == NULL) return -1;
 
     PF_XYWH pf_create_win = (PF_XYWH)GetProcAddress(handle, "create_win");
@@ -25,10 +27,12 @@ int main(int argc, char *argv[]) {
     char ch = 'r';
 
     pf_create_win(0, 0, 800, 600);
-    Sleep(1000);
-    pf_set_win_pos(100, 100);
-    Sleep(1000);
-    pf_set_win_size(1920, 1080);
+    for(int i =0; i<1000; ++i) {
+        Sleep(10);
+        pf_set_win_pos(1000-i, 1000-i);
+        Sleep(10);
+        pf_set_win_size(100+i, 100+i);
+    }
 
     while (ch != 'q') {
         ch = getchar();

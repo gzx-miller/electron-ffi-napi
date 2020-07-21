@@ -28,7 +28,16 @@ function createWindow () {
   });
   mainWin.on("restore", () => {
     mainWin.webContents.send("show_window", { show: 1 });
-  })
+  });
+  mainWin.on('minimize', ()=> {
+    mainWin.webContents.send("show_window", { show: 0 });
+  });
+  mainWin.on('move', () => {
+    mainWin.webContents.send("window_move");
+  });
+  mainWin.on('resize', () =>{
+    console.log("on resize");
+  });
 }
 
 app.on('ready', createWindow)
@@ -45,15 +54,8 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('resetWindowSize', (event, size) => {
-  mainWin.setSize(size.width, size.height);
-});
-
 ipcMain.on('switch_min', (event, arg) => {
   let isMini = mainWin.isMinimized();
-  if(!isMini) {
-    mainWin.minimize();
-    event.sender.send("show_window", { show: 0 });
-  }
+  if(!isMini) mainWin.minimize();
 });
 

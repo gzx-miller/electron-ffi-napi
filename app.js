@@ -69,7 +69,24 @@ function regClick() {
 ipcRenderer.on("show_window", (ev, arg)=>{
   console.log("on recv show_window:" + JSON.stringify(arg));
   window.ffi_napi.show_win(arg.show);
-})
+});
+
+ipcRenderer.on("window_resize", (ev, arg)=>{
+  console.log("on recv window_resize:" + JSON.stringify(arg));
+  window.ffi_napi.set_win_size(arg.w, arg.h);
+});
+
+let preLeft, preTop;
+ipcRenderer.on("window_move", (ev, arg)=>{
+  if (preLeft !== window.screenLeft || preTop !== window.screenTop) {
+    preLeft = window.screenLeft;
+    preTop = window.screenTop;
+    let x = window.screenLeft// + window.outerWidth - window.innerWidth - 1;
+    let y = window.screenTop// + window.outerHeight - window.innerHeight - 1
+    console.log(`on recv window_move: ${x}, ${y}`);
+    window.ffi_napi.set_win_pos(x, y);
+  }
+});
 
 window.onload = () => {
   test_ffi_napi();
