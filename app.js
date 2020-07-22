@@ -4,7 +4,7 @@ function test_ffi_napi() {
   try {
     let ffi = require("ffi-napi");
     var ref = require("ref-napi");
-    window.ffi_napi = ffi.Library("my_win/release/little_win.dll", {
+    window.ffi_napi = ffi.Library("my_win/release/my_win.dll", {
       create_win: ["bool", ["int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
@@ -62,16 +62,17 @@ function regClick() {
       ipcRenderer.send('switch_min', '');
   };
   document.querySelector('#close_btn').onclick = () => {
-      window.close();
+    window.ffi_napi.quit_win();
+    window.close();
   };
 }
 
-ipcRenderer.on("show_window", (ev, arg)=>{
+ipcRenderer.on("show_window", (ev, arg) => {
   console.log("on recv show_window:" + JSON.stringify(arg));
   window.ffi_napi.show_win(arg.show);
 });
 
-ipcRenderer.on("window_resize", (ev, arg)=>{
+ipcRenderer.on("window_resize", (ev, arg)=> {
   console.log("on recv window_resize:" + JSON.stringify(arg));
   window.ffi_napi.set_win_size(arg.w, arg.h);
 });

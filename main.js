@@ -59,3 +59,9 @@ ipcMain.on('switch_min', (event, arg) => {
   if(!isMini) mainWin.minimize();
 });
 
+let isMaxed  = false;
+ipcMain.on('switch_max', (event, arg) => {
+  (isMaxed = !isMaxed)?
+  mainWin.maximize():
+  mainWin.unmaximize();
+});
