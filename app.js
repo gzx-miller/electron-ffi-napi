@@ -1,5 +1,36 @@
 const { ipcRenderer } = require('electron');
 
+let playerLeft = 0;
+let playerTop = 0;
+function getPlayerPos() {
+  var player = window.player;
+  var actualTop = player.offsetTop;
+  var actualLeft = player.offsetLeft;
+  var current = player.offsetParent;
+  while (current !== null) {
+    actualTop += current.offsetTop;
+    actualLeft += current.offsetLeft;
+    current = current.offsetParent;
+  }
+  playerLeft = actualLeft;
+  playerTop = actualTop;
+  console.log(`getPlayerPos: ${playerLeft}, ${playerTop}`)
+}
+
+let winLeft = 0, winTop = 0;
+let scrollTop = 0;
+function getWinPos() {
+  if (window.screenLeft < -5000 ||
+      window.screenTop < -5000 || (
+      winLeft === window.screenLeft &&
+      winTop === window.screenTop)) {
+        return false;
+  }
+  winLeft = window.screenLeft;
+  winTop = window.screenTop;
+  return true;
+}
+
 function test_ffi_napi() {
   try {
     let ffi = require("ffi-napi");
@@ -15,11 +46,6 @@ function test_ffi_napi() {
   } catch (error) {
     console.error("[err] ffi.Library:", error);
   }
-
-  ffi_napi.create_win(100, 100, 300, 200);
-  // ffi_napi.set_win_pos(200, 200);
-  // ffi_napi.set_win_size(800, 600);
-  //ffi_napi.quit_win();
 }
 
 function observePlayerSize() {  
@@ -35,7 +61,11 @@ function observePlayerSize() {
 
   var container = document.getElementById("container");
   container.addEventListener("scroll", (ev) => {
-    console.log("on scroll");
+    console.log("on scroll: " + container.scrollTop);
+    scrollTop = container.scrollTop;
+    let x = winLeft + playerLeft;
+    let y = winTop + playerTop - scrollTop;
+    window.ffi_napi.set_win_pos(x, y);
   });
 
   var observer = new MutationObserver(function (mutations) {
@@ -72,25 +102,26 @@ ipcRenderer.on("show_window", (ev, arg) => {
   window.ffi_napi.show_win(arg.show);
 });
 
-ipcRenderer.on("window_resize", (ev, arg)=> {
-  console.log("on recv window_resize:" + JSON.stringify(arg));
-  window.ffi_napi.set_win_size(arg.w, arg.h);
-});
-
-let preLeft, preTop;
 ipcRenderer.on("window_move", (ev, arg)=>{
-  if (preLeft !== window.screenLeft || preTop !== window.screenTop) {
-    preLeft = window.screenLeft;
-    preTop = window.screenTop;
-    let x = window.screenLeft// + window.outerWidth - window.innerWidth - 1;
-    let y = window.screenTop// + window.outerHeight - window.innerHeight - 1
-    console.log(`on recv window_move: ${x}, ${y}`);
-    window.ffi_napi.set_win_pos(x, y);
-  }
+  if (!getWinPos()) return false;
+  let x = winLeft + playerLeft;
+  let y = winTop + playerTop - scrollTop;
+  console.log(`on recv window_move: ${x}, ${y}`);
+  window.ffi_napi.set_win_pos(x, y);
 });
 
+function initWin() {
+  window.player = document.getElementById("player");
+  getPlayerPos();
+  getWinPos();
+  let x = winLeft + playerLeft;
+  let y = winTop + playerTop;
+  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}`);
+  ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight);
+}
 window.onload = () => {
   test_ffi_napi();
   observePlayerSize();
   regClick();
+  initWin();  
 };

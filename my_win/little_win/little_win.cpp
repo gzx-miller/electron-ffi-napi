@@ -26,7 +26,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         lastX = wParam >> 16;
         lastH = lParam & 0xffff;
         lastW = lParam >> 16;
-        SetWindowPos(g_hwnd, HWND_TOP,
+        SetWindowPos(g_hwnd, HWND_TOPMOST,
             lastX, lastY, lastW, lastH, SWP_SHOWWINDOW);
         sprintLog("rcv set_win_pos: %d,%d,%d,%d \r\n",
             lastX, lastY, lastW, lastH);
@@ -35,10 +35,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_SHOW_WIN: {
         BOOL show = (BOOL)wParam;
         ShowWindow(g_hwnd, show? SW_SHOW : SW_HIDE);
-        SetWindowPos(g_hwnd, HWND_TOPMOST,
-            lastX, lastY, lastW, lastH, show ? SWP_SHOWWINDOW : SWP_HIDEWINDOW);
-        sprintLog("rcv show_win: %d \r\n",
-            show);
+        sprintLog("rcv show_win: %d \r\n", show);
         }
         break;
     case WM_PAINT:
@@ -69,7 +66,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
-    g_hwnd = CreateWindow("MyWinClass", "MyWinTitle", WS_OVERLAPPEDWINDOW,
+    g_hwnd = CreateWindow("MyWinClass", "MyWinTitle", 
+        WS_OVERLAPPEDWINDOW| WS_EX_TOPMOST,
         100, 100, 400, 300, nullptr, nullptr, hInstance, nullptr);
     if (!g_hwnd) return FALSE;
     ShowWindow(g_hwnd, nCmdShow);
