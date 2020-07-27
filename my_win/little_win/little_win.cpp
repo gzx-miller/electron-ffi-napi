@@ -38,8 +38,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         sprintLog("rcv show_win: %d \r\n", show);
         }
         break;
-    case WM_PAINT:
-        break;
+    case WM_PAINT: {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        // TODO: 在此处添加使用 hdc 的任何绘图代码...
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -58,7 +63,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = (HBRUSH)(COLOR_HIGHLIGHTTEXT);
     wcex.lpszClassName = "MyWinClass";
     wcex.hIcon = NULL;
     wcex.hIconSm = NULL;
@@ -66,10 +71,32 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
-    g_hwnd = CreateWindow("MyWinClass", "MyWinTitle", 
-        WS_OVERLAPPEDWINDOW| WS_EX_TOPMOST,
-        100, 100, 400, 300, nullptr, nullptr, hInstance, nullptr);
+    char* cmdLine = GetCommandLine();
+    int x = 100, y = 100, w = 600, h = 800;
+    HWND hwnd_parent = (HWND)0;
+    //sscanf_s(cmdLine, "%d,%d,%d,%d,%d",
+    //    &x, sizeof(x), &y, sizeof(y),
+    //    &w, sizeof(w), &h, sizeof(h),
+    //    &hwnd_g, sizeof(hwnd_g));
+    
+    // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
+    hwnd_parent = (HWND)0x2d0e1c;
+    // hwnd_parent = FindWindow("Chrome_WidgetWin_0", "");
+    if (hwnd_parent == NULL) {
+        g_hwnd = CreateWindowEx(WS_EX_TOPMOST, "MyWinClass", "MyWinTitle",
+            WS_POPUPWINDOW,
+            x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
+    } else {
+        g_hwnd = CreateWindowEx(WS_EX_TRANSPARENT,
+            "MyWinClass", "MyWinTitle",
+            WS_CHILDWINDOW,
+            x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
+    }
+
     if (!g_hwnd) return FALSE;
+
+    //SetWindowLong(g_hwnd, GWL_HWNDPARENT, (LONG)hwnd_parent);
+    SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
     ShowWindow(g_hwnd, nCmdShow);
     UpdateWindow(g_hwnd);
     return TRUE;

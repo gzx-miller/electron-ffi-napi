@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, BrowserWindow } = require('electron');
 
 let playerLeft = 0;
 let playerTop = 0;
@@ -36,7 +36,7 @@ function test_ffi_napi() {
     let ffi = require("ffi-napi");
     var ref = require("ref-napi");
     window.ffi_napi = ffi.Library("my_win/release/my_win.dll", {
-      create_win: ["bool", ["int", "int", "int", "int"]],
+      create_win: ["bool", ["int", "int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
       quit_win: ["bool", []],
@@ -111,13 +111,14 @@ ipcRenderer.on("window_move", (ev, arg)=>{
 });
 
 function initWin() {
+  let hwnd = ipcRenderer.sendSync('getWindowId');
   window.player = document.getElementById("player");
   getPlayerPos();
   getWinPos();
   let x = winLeft + playerLeft;
   let y = winTop + playerTop;
-  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}`);
-  ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight);
+  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
+  ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight, hwnd);
 }
 window.onload = () => {
   test_ffi_napi();

@@ -13,6 +13,7 @@ function createWindow () {
     frame: false,
     transparent: true,
     alwaysOnTop: false,
+    title:"my_electron_win",
     webPreferences: {
       nodeIntegration: true
     }
@@ -43,6 +44,8 @@ function createWindow () {
   });
 }
 
+app.disableDomainBlockingFor3DAPIs();
+app.disableHardwareAcceleration();
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -67,4 +70,9 @@ ipcMain.on('switch_max', (event, arg) => {
   (isMaxed = !isMaxed)?
   mainWin.maximize():
   mainWin.unmaximize();
+});
+
+ipcMain.on('getWindowId', (event, arg) => {
+  let hwnd = mainWin.getNativeWindowHandle();
+  event.returnValue = hwnd.readUInt32LE(0);
 });
