@@ -4,7 +4,7 @@
 
 using namespace std;
 
-typedef bool(*PF_XYWH)(int x, int y, int w, int h);
+typedef bool(*PF_XYWH)(int x, int y, int w, int h, int hwnd);
 typedef bool(*PF_WH)(int w, int h);
 typedef bool(*PF_quit)();
 
@@ -26,13 +26,13 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     char ch = 'r';
 
-    pf_create_win(0, 0, 800, 600);
-    for(int i =0; i<1000; ++i) {
-        //Sleep(1);
-        pf_set_win_pos(1000-i, 1000-i);
-        //Sleep(1);
-        pf_set_win_size(100+i, 100+i);
-    }
+    pf_create_win(0, 0, 800, 600, 0x400A00);
+    //for(int i =0; i<1000; ++i) {
+    //    //Sleep(1);
+    //    pf_set_win_pos(1000-i, 1000-i);
+    //    //Sleep(1);
+    //    pf_set_win_size(100+i, 100+i);
+    //}
 
     while (ch != 'q') {
         ch = getchar();

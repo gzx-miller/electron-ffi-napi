@@ -115,8 +115,8 @@ function initWin() {
   window.player = document.getElementById("player");
   getPlayerPos();
   getWinPos();
-  let x = winLeft + playerLeft;
-  let y = winTop + playerTop;
+  let x = playerLeft;
+  let y = playerTop;
   console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
   ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight, hwnd);
 }

@@ -3,18 +3,32 @@
 
 #include "framework.h"
 #include "little_win.h"
+#include <string>
+using namespace std;
 
 #define WM_SET_WIN_POS WM_USER + 2
 #define WM_SHOW_WIN WM_USER + 3
 
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
+static void WriteToDebug(const char* buffer, size_t size) {
+    static HANDLE hFile = INVALID_HANDLE_VALUE;
+    if (hFile == INVALID_HANDLE_VALUE) {
+        hFile = CreateFileA("./debug.log", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
+        if (hFile == INVALID_HANDLE_VALUE) return;
+        // SetFilePointer(hFile, 0, NULL, FILE_END);
+    }
+    DWORD dwBytesWritten;
+    if (!WriteFile(hFile, buffer, size, &dwBytesWritten, NULL)) return;
+    FlushFileBuffers(hFile);
+}
+
 void sprintLog(const char *format, ...) {
     char strBuf[512] = { 0 };
     va_list ap;
     va_start(ap, format);
     _vsnprintf_s(strBuf, sizeof(strBuf) - 1, format, ap);
     va_end(ap);
-    // WriteToDebug(strBuf, strlen(strBuf));
+    WriteToDebug(strBuf, strlen(strBuf));
     OutputDebugStringA(strBuf);
 }
 
@@ -74,12 +88,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
     int x = 200, y = -200, w = 600, h = 600;
     HWND hwnd_parent = (HWND)0;
-    //sscanf_s(cmdLine, "%d,%d,%d,%d,%d",
-    //    &x, sizeof(x), &y, sizeof(y),
-    //    &w, sizeof(w), &h, sizeof(h),
-    //    &hwnd_g, sizeof(hwnd_g));
+    // sprintLog(cmdLine, strlen(cmdLine));
+    string strCmd(cmdLine);
+    int f = strCmd.find(' ');
+    string strParams = strCmd.substr(f);
+    sscanf(strParams.c_str(), "%d,%d,%d,%d,%d",
+        &x, &y, &w, &h, &hwnd_parent);
+    sprintLog("InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_parent);
     
-    hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
+    // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
     // hwnd_parent = (HWND)0x5720EE;
     // hwnd_parent = FindWindow("Chrome_WidgetWin_0", "");
     if (hwnd_parent == NULL) {

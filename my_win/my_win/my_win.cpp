@@ -35,30 +35,38 @@ HWND g_hwnd = NULL;
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
     lastX = x; lastY = y; lastW = w; lastH = h;
-    sprintLog("create_win: %d,%d,%d,%d,%d \r\n", x, y, w, h, hwnd);
+    sprintLog("create_win: %d,%d,%d,%d,%x \r\n", x, y, w, h, hwnd);
 
-    // ostringstream ostr;
-    // ostr << x << "," << y << "," << w << "," << h;
+    ostringstream ostr;
+    ostr << x << "," << y << "," << w << "," << h << ',' << hwnd;
 
     //PROCESS_INFORMATION pi;
     //CreateProcess(
-    //    "./my_win/Release/little_win.exe",
+    //    NULL,
     //    const_cast<char*>(ostr.str().c_str()),
-    //    NULL, NULL, TRUE, NULL,NULL, NULL, NULL,
+    //    NULL, NULL, TRUE, NULL, NULL, NULL, NULL,
     //    &pi
     //);
 
-    //if (g_hwnd == NULL) {
-    //    g_hwnd = FindWindow("MyWinClass", "MyWinTitle");
-    //    if (g_hwnd == NULL) return false;
-    //}
-	if (g_hwnd == NULL) {
-        g_hwnd = FindWindow("MyWinClass", "MyWinTitle");
-        if (g_hwnd == NULL) return false;
-    }
-    PostMessage(g_hwnd, WM_SET_WIN_POS, 
-        (lastX<<16) |lastY, (lastW<<16) | lastH);
-    sprintLog("create_win: %d,%d,%d,%d \r\n", x, y, w, h);
+    SHELLEXECUTEINFO ShExecInfo;
+    ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+    ShExecInfo.fMask = SEE_MASK_NOASYNC;
+    ShExecInfo.hwnd = NULL;
+    ShExecInfo.lpVerb = "open";
+    ShExecInfo.lpFile = "little_win.exe";
+    ShExecInfo.lpParameters = ostr.str().c_str();
+    ShExecInfo.lpDirectory = "D:/DCode/electron/electron-ffi-napi/my_win/Release/";
+    ShExecInfo.nShow = SW_NORMAL;
+    ShExecInfo.hInstApp = NULL;
+    ShellExecuteEx(&ShExecInfo);
+
+   // if (g_hwnd == NULL) {
+   //     g_hwnd = FindWindow("MyWinClass", "MyWinTitle");
+   //     if (g_hwnd == NULL) return false;
+   // }
+   // PostMessage(g_hwnd, WM_SET_WIN_POS, 
+   //     (lastX<<16) |lastY, (lastW<<16) | lastH);
+   // sprintLog("create_win: %d,%d,%d,%d \r\n", x, y, w, h);
     return true;
 }
 
