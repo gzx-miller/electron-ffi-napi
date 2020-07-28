@@ -11,7 +11,7 @@ function createWindow () {
     minWidth: 400,
     minHeight: 300,
     frame: false,
-    transparent: true,
+    transparent: false,
     alwaysOnTop: false,
     title:"my_electron_win",
     webPreferences: {
