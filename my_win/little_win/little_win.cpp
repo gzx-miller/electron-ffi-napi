@@ -79,8 +79,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     //    &w, sizeof(w), &h, sizeof(h),
     //    &hwnd_g, sizeof(hwnd_g));
     
-    // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
-    hwnd_parent = (HWND)0x5720EE;
+    hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
+    // hwnd_parent = (HWND)0x5720EE;
     // hwnd_parent = FindWindow("Chrome_WidgetWin_0", "");
     if (hwnd_parent == NULL) {
         g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
@@ -88,6 +88,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
             WS_POPUPWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
             x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
     } else {
+        long style = GetWindowLong(hwnd_parent, GWL_STYLE);
+        style |= WS_CLIPCHILDREN;
+        SetWindowLong(hwnd_parent, GWL_STYLE, style);
         g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
             "MyWinClass", "MyWinTitle",
             WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,

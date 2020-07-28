@@ -11,14 +11,14 @@ function createWindow () {
     minWidth: 400,
     minHeight: 300,
     frame: false,
-    transparent: false,
+    // transparent: false,
     alwaysOnTop: false,
     title:"my_electron_win",
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: true,
-      webSecurity: false,
-      webgl: false
+      //allowRunningInsecureContent: true,
+      //webSecurity: false,
+      //webgl: false
     }
   })
 
@@ -28,7 +28,7 @@ function createWindow () {
     slashes: true
   }))
 
-  //mainWin.webContents.openDevTools();
+  mainWin.webContents.openDevTools();
 
   mainWin.on('closed', () => {
     mainWin = null
@@ -47,7 +47,7 @@ function createWindow () {
   });
 }
 
-app.disableDomainBlockingFor3DAPIs();
+// app.disableDomainBlockingFor3DAPIs();
 app.disableHardwareAcceleration();
 app.on('ready', createWindow)
 
