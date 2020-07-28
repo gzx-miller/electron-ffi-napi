@@ -72,22 +72,22 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
-    int x = 100, y = 100, w = 600, h = 800;
+    int x = 200, y = -200, w = 600, h = 600;
     HWND hwnd_parent = (HWND)0;
     //sscanf_s(cmdLine, "%d,%d,%d,%d,%d",
     //    &x, sizeof(x), &y, sizeof(y),
     //    &w, sizeof(w), &h, sizeof(h),
     //    &hwnd_g, sizeof(hwnd_g));
     
-    // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
-    hwnd_parent = (HWND)0x2d0e1c;
+    hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
+    // hwnd_parent = (HWND)0x122194;
     // hwnd_parent = FindWindow("Chrome_WidgetWin_0", "");
     if (hwnd_parent == NULL) {
         g_hwnd = CreateWindowEx(WS_EX_TOPMOST, "MyWinClass", "MyWinTitle",
             WS_POPUPWINDOW,
             x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
     } else {
-        g_hwnd = CreateWindowEx(WS_EX_TRANSPARENT,
+        g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
             "MyWinClass", "MyWinTitle",
             WS_CHILDWINDOW,
             x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);

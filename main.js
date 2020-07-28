@@ -15,7 +15,10 @@ function createWindow () {
     alwaysOnTop: false,
     title:"my_electron_win",
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      allowRunningInsecureContent: true,
+      webSecurity: false,
+      webgl: false
     }
   })
 
@@ -25,7 +28,7 @@ function createWindow () {
     slashes: true
   }))
 
-  mainWin.webContents.openDevTools();
+  //mainWin.webContents.openDevTools();
 
   mainWin.on('closed', () => {
     mainWin = null
