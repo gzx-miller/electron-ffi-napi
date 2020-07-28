@@ -33,18 +33,6 @@ function createWindow () {
   mainWin.on('closed', () => {
     mainWin = null
   });
-  mainWin.on("restore", () => {
-    mainWin.webContents.send("show_window", { show: 1 });
-  });
-  mainWin.on('minimize', ()=> {
-    mainWin.webContents.send("show_window", { show: 0 });
-  });
-  mainWin.on('move', () => {
-    mainWin.webContents.send("window_move");
-  });
-  mainWin.on('resize', () =>{
-    console.log("on resize");
-  });
 }
 
 // app.disableDomainBlockingFor3DAPIs();

@@ -97,19 +97,6 @@ function regClick() {
   };
 }
 
-ipcRenderer.on("show_window", (ev, arg) => {
-  console.log("on recv show_window:" + JSON.stringify(arg));
-  window.ffi_napi.show_win(arg.show);
-});
-
-ipcRenderer.on("window_move", (ev, arg)=>{
-  if (!getWinPos()) return false;
-  let x = winLeft + playerLeft;
-  let y = winTop + playerTop - scrollTop;
-  console.log(`on recv window_move: ${x}, ${y}`);
-  window.ffi_napi.set_win_pos(x, y);
-});
-
 function initWin() {
   let hwnd = ipcRenderer.sendSync('getWindowId');
   window.player = document.getElementById("player");
