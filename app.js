@@ -27,8 +27,7 @@ function test_ffi_napi() {
       create_win: ["bool", ["int", "int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
-      quit_win: ["bool", []],
-      show_win: ["bool", ["int"]]
+      quit_win: ["bool", []]
     });
     console.log("[init] fii.Library:", ffi_napi);
   } catch (error) {
