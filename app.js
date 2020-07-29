@@ -86,10 +86,13 @@ function regClick() {
       ipcRenderer.send('switch_min', '');
   };
   document.querySelector('#close_btn').onclick = () => {
-    window.ffi_napi.quit_win();
     window.close();
   };
 }
+
+ipcRenderer.on("window_closed", () =>{
+  window.ffi_napi.quit_win();
+})
 
 function initWin() {
   let hwnd = ipcRenderer.sendSync('getWindowId');

@@ -31,7 +31,7 @@ function createWindow () {
   mainWin.webContents.openDevTools();
 
   mainWin.on('closed', () => {
-    mainWin = null
+    mainWin = null;
   });
 }
 
@@ -41,6 +41,7 @@ app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    mainWin.webContents.send("window_closed");
     app.quit()
   }
 })
