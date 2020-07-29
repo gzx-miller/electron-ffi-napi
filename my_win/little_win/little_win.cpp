@@ -17,16 +17,6 @@ int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 HWND g_hwnd;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
-    case WM_SET_WIN_POS: {
-        lastY = wParam & 0xffff;
-        lastX = wParam >> 16;
-        lastH = lParam & 0xffff;
-        lastW = lParam >> 16;
-        SetWindowPos(g_hwnd, HWND_TOP, lastX, lastY, lastW, lastH, SWP_SHOWWINDOW);
-        sprintLog("rcv set_win_pos: %d,%d,%d,%d \r\n",
-            lastX, lastY, lastW, lastH);
-        }
-        break;
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);

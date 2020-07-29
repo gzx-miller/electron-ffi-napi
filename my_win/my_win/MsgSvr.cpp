@@ -1,32 +1,27 @@
 #include "MsgSvr.h"
 
-bool EvtSvr::Create(string name)
-{
+bool EvtSvr::Create(string name) {
     _hEvent = CreateEvent(NULL, FALSE, FALSE, name.c_str());
     return _hEvent != NULL;
 }
 
-bool EvtSvr::Wait(DWORD time /*= INFINITE*/)
-{
+bool EvtSvr::Wait(DWORD time) {
     if (_hEvent) WaitForSingleObject(_hEvent, time);
     return true;
 }
 
-bool EvtSvr::Signal()
-{
+bool EvtSvr::Signal() {
     if (_hEvent) SetEvent(_hEvent);
     return true;
 }
 
-bool EvtSvr::Uninit()
-{
+bool EvtSvr::Uninit() {
     if (_hEvent) CloseHandle(_hEvent);
     return true;
 }
 
-bool MsgSvr::Listen(string name)
-{
-    string strGlobal = "Global\\";
+bool MsgSvr::Listen(string name) {
+    string strGlobal = "Local\\";
     _evtSvr.Create((strGlobal + name + string("_event")).c_str());
     _evtSvr.Wait();
 
@@ -39,23 +34,20 @@ bool MsgSvr::Listen(string name)
     return true;
 }
 
-bool MsgSvr::Unint()
-{
+bool MsgSvr::Unint() {
     _evtSvr.Signal();
     if (_pBuf)  UnmapViewOfFile(_pBuf);
     if (_hMapFile) CloseHandle(_hMapFile);
     return true;
 }
 
-bool MsgSvr::WaitMsg(int time /*= INFINITE*/)
-{
+bool MsgSvr::WaitMsg(int time) {
     _evtSvr.Wait(time);
     if (_onRcvMsg) _onRcvMsg(*((MsgStruct*)_pBuf));
     return true;
 }
 
-bool MsgSvr::PostMsg(MsgStruct &msg)
-{
+bool MsgSvr::PostMsg(MsgStruct &msg) {
     if (_pBuf) memcpy_s((void*)_pBuf, _bufSize, &msg, sizeof(msg));
     _evtSvr.Signal();
     return true;

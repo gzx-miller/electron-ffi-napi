@@ -1,8 +1,7 @@
 #include "MsgClient.h"
 using namespace std;
 
-void WriteToDebug(const char* buffer, size_t size)
-{
+void WriteToDebug(const char* buffer, size_t size) {
     static HANDLE hFile = INVALID_HANDLE_VALUE;
     if (hFile == INVALID_HANDLE_VALUE) {
         hFile = CreateFileA("./debug.log", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
@@ -14,8 +13,7 @@ void WriteToDebug(const char* buffer, size_t size)
     FlushFileBuffers(hFile);
 }
 
-void sprintLog(const char *format, ...)
-{
+void sprintLog(const char *format, ...) {
     char strBuf[512] = { 0 };
     va_list ap;
     va_start(ap, format);
@@ -52,7 +50,7 @@ bool EvtClient::Uninit() {
 }
 
 bool MsgClient::Connect(string name) {
-    string strGlobal = "Global\\";
+    string strGlobal = "Local\\";
     _evtClient.Connect((strGlobal + name + string("_event")).c_str());
 
     _hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL,
