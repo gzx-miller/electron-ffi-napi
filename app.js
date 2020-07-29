@@ -1,7 +1,7 @@
 const { ipcRenderer, BrowserWindow } = require('electron');
 
-let playerLeft = 0;
-let playerTop = 0;
+let playerX = 0;
+let playerY = 0;
 function getPlayerPos() {
   var player = window.player;
   var actualTop = player.offsetTop;
@@ -12,24 +12,12 @@ function getPlayerPos() {
     actualLeft += current.offsetLeft;
     current = current.offsetParent;
   }
-  playerLeft = actualLeft;
-  playerTop = actualTop;
-  console.log(`getPlayerPos: ${playerLeft}, ${playerTop}`)
+  playerX = actualLeft;
+  playerY = actualTop;
+  console.log(`getPlayerPos: ${playerX}, ${playerY}`)
 }
 
-let winLeft = 0, winTop = 0;
 let scrollTop = 0;
-function getWinPos() {
-  if (window.screenLeft < -5000 ||
-      window.screenTop < -5000 || (
-      winLeft === window.screenLeft &&
-      winTop === window.screenTop)) {
-        return false;
-  }
-  winLeft = window.screenLeft;
-  winTop = window.screenTop;
-  return true;
-}
 
 function test_ffi_napi() {
   try {
@@ -51,7 +39,7 @@ function test_ffi_napi() {
 function observePlayerSize() {  
   var body = document.getElementsByTagName("body")[0];
   var player = document.getElementById("player");
-  window.onresize = () =>{
+  window.onresize = () =>{  // TestCode: change dom size
     body.style.width = window.innerWidth + "px";
     body.style.height = window.innerHeight + "px";
     player.style.width = window.innerWidth * 0.8 + "px";
@@ -60,18 +48,24 @@ function observePlayerSize() {
   window.onresize();
 
   var container = document.getElementById("container");
-  container.addEventListener("scroll", (ev) => {
+  container.addEventListener("scroll", (ev) => {  // TestCode: change dom pos
     console.log("on scroll: " + container.scrollTop);
     scrollTop = container.scrollTop;
-    let x = winLeft + playerLeft;
-    let y = winTop + playerTop - scrollTop;
+    let x = playerX;
+    let y = playerY - scrollTop;
     window.ffi_napi.set_win_pos(x, y);
   });
 
+  let preWidth = 0, preHeight = 0;
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
-      console.log(`mutation: ${player.clientWidth}, ${player.clientHeight}`);
-      window.ffi_napi.set_win_size(player.clientWidth, player.clientHeight);
+      if (player.clientWidth != preWidth || 
+          player.clientHeight != preHeight) {
+          preWidth = player.clientWidth;
+          preHeight = player.clientHeight;
+          console.log(`mutation: ${player.clientWidth}, ${player.clientHeight}`);
+          window.ffi_napi.set_win_size(player.clientWidth, player.clientHeight);
+      }
     });
   });
   var config = {
@@ -101,11 +95,8 @@ function initWin() {
   let hwnd = ipcRenderer.sendSync('getWindowId');
   window.player = document.getElementById("player");
   getPlayerPos();
-  getWinPos();
-  let x = playerLeft;
-  let y = playerTop;
-  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
-  ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight, hwnd);
+  console.log(`initWin: ${playerX}, ${playerY}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
+  ffi_napi.create_win(playerX, playerY, player.clientWidth, player.clientHeight, hwnd);
 }
 window.onload = () => {
   test_ffi_napi();

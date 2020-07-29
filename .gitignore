@@ -1,0 +1,12 @@
+node_modules
+dist
+*.pdb
+*.suo
+*.db
+*.opendb
+*.lastbuildstate
+*.tlog
+*.ipch
+*.obj
+*.log
+*.exe

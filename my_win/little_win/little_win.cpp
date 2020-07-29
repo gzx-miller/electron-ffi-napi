@@ -46,12 +46,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             lastX, lastY, lastW, lastH);
         }
         break;
-    case WM_SHOW_WIN: {
-        BOOL show = (BOOL)wParam;
-        ShowWindow(g_hwnd, show? SW_SHOW : SW_HIDE);
-        sprintLog("rcv show_win: %d \r\n", show);
-        }
-        break;
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
