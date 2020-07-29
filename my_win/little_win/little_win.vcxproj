@@ -155,11 +155,13 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="little_win.h" />
+    <ClInclude Include="MsgClient.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="little_win.cpp" />
+    <ClCompile Include="MsgClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="little_win.rc" />

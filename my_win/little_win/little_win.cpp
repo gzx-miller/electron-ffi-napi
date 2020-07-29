@@ -2,35 +2,16 @@
 //
 
 #include "framework.h"
-#include "little_win.h"
 #include <string>
+#include "little_win.h"
+#include "MsgClient.h"
+
 using namespace std;
 
 #define WM_SET_WIN_POS WM_USER + 2
 #define WM_SHOW_WIN WM_USER + 3
 
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
-static void WriteToDebug(const char* buffer, size_t size) {
-    static HANDLE hFile = INVALID_HANDLE_VALUE;
-    if (hFile == INVALID_HANDLE_VALUE) {
-        hFile = CreateFileA("./debug.log", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
-        if (hFile == INVALID_HANDLE_VALUE) return;
-        // SetFilePointer(hFile, 0, NULL, FILE_END);
-    }
-    DWORD dwBytesWritten;
-    if (!WriteFile(hFile, buffer, size, &dwBytesWritten, NULL)) return;
-    FlushFileBuffers(hFile);
-}
-
-void sprintLog(const char *format, ...) {
-    char strBuf[512] = { 0 };
-    va_list ap;
-    va_start(ap, format);
-    _vsnprintf_s(strBuf, sizeof(strBuf) - 1, format, ap);
-    va_end(ap);
-    WriteToDebug(strBuf, strlen(strBuf));
-    OutputDebugStringA(strBuf);
-}
 
 HWND g_hwnd;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -40,8 +21,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         lastX = wParam >> 16;
         lastH = lParam & 0xffff;
         lastW = lParam >> 16;
-        SetWindowPos(g_hwnd, HWND_TOPMOST,
-            lastX, lastY, lastW, lastH, SWP_SHOWWINDOW);
+        SetWindowPos(g_hwnd, HWND_TOP, lastX, lastY, lastW, lastH, SWP_SHOWWINDOW);
         sprintLog("rcv set_win_pos: %d,%d,%d,%d \r\n",
             lastX, lastY, lastW, lastH);
         }
@@ -78,9 +58,15 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
     return RegisterClassEx(&wcex);
 }
 
+bool onRcvMsg(MsgStruct & msg) {
+    sprintLog("MsgClient onRcvMsg: %d,%x \r\n", msg.type, msg.val);
+    return true;
+}
+MsgClient msgClient(sizeof(MsgStruct), onRcvMsg);
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
-    int x = 200, y = -200, w = 600, h = 600;
+    int x = 0, y = 0, w = 400, h = 300;
     HWND hwnd_parent = (HWND)0;
     // sprintLog(cmdLine, strlen(cmdLine));
     string strCmd(cmdLine);
@@ -91,8 +77,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     sprintLog("InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_parent);
     
     // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
-    // hwnd_parent = (HWND)0x5720EE;
-    // hwnd_parent = FindWindow("Chrome_WidgetWin_0", "");
     if (hwnd_parent == NULL) {
         g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
             "MyWinClass", "MyWinTitle",
@@ -109,8 +93,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     }
 
     if (!g_hwnd) return FALSE;
-
-    //SetWindowLong(g_hwnd, GWL_HWNDPARENT, (LONG)hwnd_parent);
+    msgClient.Connect(string("player_win"));
+    MsgStruct msg;
+    msg.type = win_handle;
+    msg.val = (int)g_hwnd;
+    msgClient.PostMsg(msg);
+    
     SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
     ShowWindow(g_hwnd, nCmdShow);
     UpdateWindow(g_hwnd);
@@ -123,10 +111,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
     MyRegisterClass(hInstance);
     if (!InitInstance(hInstance, nCmdShow)) return FALSE;
-
-    //for (int i = 0; i < 1000; ++i) {
-    //    SetWindowPos(g_hwnd, HWND_TOPMOST, 1000 - i, 1000 - i, 100 + i, 100 + i, SWP_SHOWWINDOW);
-    //}
 
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0)) {

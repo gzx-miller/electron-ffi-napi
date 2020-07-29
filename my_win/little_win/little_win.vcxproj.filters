@@ -27,9 +27,15 @@
     <ClInclude Include="little_win.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MsgClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="little_win.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgClient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

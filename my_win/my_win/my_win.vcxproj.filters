@@ -18,9 +18,15 @@
     <ClInclude Include="my_win.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MsgSvr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="my_win.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgSvr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

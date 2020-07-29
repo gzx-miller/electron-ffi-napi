@@ -126,9 +126,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MsgSvr.h" />
     <ClInclude Include="my_win.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MsgSvr.cpp" />
     <ClCompile Include="my_win.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
