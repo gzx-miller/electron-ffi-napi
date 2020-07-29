@@ -1,5 +1,13 @@
+
 node_modules
 dist
+*.dll
+*.exp
+*.lib
+*.ipdb
+*.iobj
+*.db-shm
+*.db-wal
 *.pdb
 *.suo
 *.db
