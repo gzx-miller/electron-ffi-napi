@@ -5,6 +5,7 @@
 #include <string>
 #include "little_win.h"
 #include "MsgClient.h"
+#include <process.h>
 
 using namespace std;
 
@@ -58,11 +59,22 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
     return RegisterClassEx(&wcex);
 }
 
+bool g_bExit = false;
 bool onRcvMsg(MsgStruct & msg) {
-    sprintLog("MsgClient onRcvMsg: %d,%x \r\n", msg.type, msg.val);
+    if(msg.type == set_new_win_pos) {
+        sprintLog("MsgClient onRcvMsg: %d,%d,%d,%d,%d \r\n", msg.type, msg.x, msg.y, msg.w, msg.h);
+        SetWindowPos(g_hwnd, HWND_TOP, msg.x, msg.y, msg.w, msg.h, SWP_SHOWWINDOW);
+    } else if (msg.type == msg_exit) {
+        g_bExit = true;
+    }
     return true;
 }
 MsgClient msgClient(sizeof(MsgStruct), onRcvMsg);
+void __cdecl threadProc(void*) {
+    while (!g_bExit) {
+        msgClient.WaitMsg();
+    }
+}
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
@@ -95,8 +107,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     if (!g_hwnd) return FALSE;
     msgClient.Connect(string("player_win"));
     MsgStruct msg;
-    msg.type = win_handle;
-    msg.val = (int)g_hwnd;
+    msg.type = set_win_hwnd;
+    msg.x = (int)g_hwnd;
     msgClient.PostMsg(msg);
     
     SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
@@ -112,10 +124,17 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     MyRegisterClass(hInstance);
     if (!InitInstance(hInstance, nCmdShow)) return FALSE;
 
+    UINT32 threadID;
+    HANDLE hThread = (HANDLE)_beginthread(threadProc, 0, 0);
+
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    WaitForSingleObject(hThread, INFINITE);
+    CloseHandle(hThread);
+
     return (int)msg.wParam;
 }

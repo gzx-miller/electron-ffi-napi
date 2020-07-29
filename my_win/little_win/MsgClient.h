@@ -21,13 +21,16 @@ public:
     bool Uninit();
 };
 enum MsgType {
-    msg_client = 1,
-    msg_svr = 2,
-    win_handle = 3,
+    set_win_hwnd = 1,
+    set_new_win_pos = 2,
+    msg_exit = 3
 };
 struct MsgStruct {
     MsgType type;
-    int val;
+    int x;
+    int y;
+    int w;
+    int h;
 };
 
 typedef bool(*PFRcvMsg)(MsgStruct & msg);

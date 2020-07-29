@@ -34,10 +34,10 @@ void sprintLog(const char *format, ...) {
 
 HWND g_hwnd = NULL;
 bool onRcvMsg(MsgStruct & msg) {
-    if (msg.type == win_handle) {
-        g_hwnd = (HWND)msg.val;
+    if(msg.type == set_win_hwnd) {
+        g_hwnd = (HWND)msg.x;
     }
-    sprintLog("MsgSvr onRcvMsg: %d,%x \r\n", msg.type, msg.val);
+    sprintLog("MsgSvr onRcvMsg: %d,%x \r\n", msg.type);
     return true;
 }
 MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
@@ -69,8 +69,16 @@ DLL_API bool set_win_pos(int x, int y) {
     sprintLog("set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
     if (!g_hwnd) return false;
     lastX = x; lastY = y;
-    PostMessage(g_hwnd, WM_SET_WIN_POS, 
-        (lastX << 16) | lastY, (lastW << 16) | lastH);
+
+    MsgStruct msg;
+    msg.type = set_new_win_pos;
+    msg.x = lastX; 
+    msg.y = lastY;
+    msg.w = lastW;
+    msg.h = lastH;
+    msgSvr.PostMsg(msg);
+    //PostMessage(g_hwnd, WM_SET_WIN_POS, 
+    //    (lastX << 16) | lastY, (lastW << 16) | lastH);
     return true;
 }
 
@@ -78,19 +86,30 @@ DLL_API bool set_win_size(int w, int h) {
     sprintLog("set_win_size: %d,%d,%x \r\n", w, h, g_hwnd);
     if (!g_hwnd) return false;
     lastW = w; lastH = h;
-    PostMessage(g_hwnd, WM_SET_WIN_POS, 
-        (lastX << 16) | lastY, (lastW << 16) | lastH);
+    MsgStruct msg;
+    msg.type = set_new_win_pos;
+    msg.x = lastX;
+    msg.y = lastY;
+    msg.w = lastW;
+    msg.h = lastH;
+    msgSvr.PostMsg(msg);
+    //PostMessage(g_hwnd, WM_SET_WIN_POS, 
+    //    (lastX << 16) | lastY, (lastW << 16) | lastH);
     return true;
 }
 
 DLL_API bool show_win(int show) {
     sprintLog("show_win: %d,%x \r\n", show, g_hwnd);
-    if (!g_hwnd) return false;
-    PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
+//    if (!g_hwnd) return false;
+//    PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
     return true;
 }
 
 DLL_API bool quit_win() {
+    MsgStruct msg;
+    msg.type = msg_exit;
+    msgSvr.PostMsg(msg);
+
     sprintLog("quit_win: \r\n");
     if (!g_hwnd) return false;
     PostMessage(g_hwnd, WM_DESTROY, 0, 0);
