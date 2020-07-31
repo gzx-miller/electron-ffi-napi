@@ -24,11 +24,10 @@
     ]
   },
   "devDependencies": {
-    "electron": "^9.1.0",
-    "electron-builder": "^21.2.0"
+    "electron": "^9.1.2"
   },
   "dependencies": {
-    "ffi-napi": "^2.4.5",
+    "ffi-napi": "^3.0.1",
     "ref-napi": "^2.0.3"
   }
 }
