@@ -32,6 +32,20 @@ void sprintLog(const char *format, ...) {
     OutputDebugStringA(strBuf);
 }
 
+PFCallback g_cb = nullptr;
+DLL_API void set_callback(PFCallback cb) {
+    sprintLog("set_callback: %x \r\n", cb);
+    g_cb = cb;
+}
+void RunJsCallback() {
+    sprintLog("callback begin: %x \r\n", g_cb);
+    if (g_cb) {
+        int ret = g_cb(123);
+        sprintLog("callback ret: %d \r\n", ret);
+        // g_cb = nullptr;
+    }
+}
+
 HWND g_hwnd = NULL;
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_win_hwnd) {
@@ -41,8 +55,10 @@ bool onRcvMsg(MsgStruct & msg) {
     return true;
 }
 MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
+
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
+    
     lastX = x; lastY = y; lastW = w; lastH = h;
     sprintLog("create_win: %d,%d,%d,%d,%x \r\n", x, y, w, h, hwnd);
     ostringstream ostr;
@@ -62,11 +78,13 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
 
     msgSvr.Listen("player_win");    // Listen can rcv one time.
     // msgSvr.WaitMsg();
+
     return true;
 }
 
 DLL_API bool set_win_pos(int x, int y) {
     sprintLog("set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
+    
     if (!g_hwnd) return false;
     lastX = x; lastY = y;
 
@@ -79,6 +97,8 @@ DLL_API bool set_win_pos(int x, int y) {
     msgSvr.PostMsg(msg);
     //PostMessage(g_hwnd, WM_SET_WIN_POS, 
     //    (lastX << 16) | lastY, (lastW << 16) | lastH);
+
+    RunJsCallback();
     return true;
 }
 
@@ -95,6 +115,8 @@ DLL_API bool set_win_size(int w, int h) {
     msgSvr.PostMsg(msg);
     //PostMessage(g_hwnd, WM_SET_WIN_POS, 
     //    (lastX << 16) | lastY, (lastW << 16) | lastH);
+
+    RunJsCallback();
     return true;
 }
 
@@ -115,3 +137,4 @@ DLL_API bool quit_win() {
     PostMessage(g_hwnd, WM_DESTROY, 0, 0);
     return true;
 }
+

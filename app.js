@@ -27,8 +27,21 @@ function test_ffi_napi() {
       create_win: ["bool", ["int", "int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
-      quit_win: ["bool", []]
+      quit_win: ["bool", []],
+      set_callback: ['void', ['pointer']]
     });
+
+    // set js callback into dll
+    var c_CallBack = ffi.Callback('int', ['int'], 
+    function(id) {
+      console.log(`[callback] ${id}`);
+      return 12345678;
+    });
+    process.on('exit', () => {
+      c_CallBack // keep reference avoid gc
+    })
+    window.ffi_napi.set_callback(c_CallBack);
+
     console.log("[init] fii.Library:", ffi_napi);
   } catch (error) {
     console.error("[err] ffi.Library:", error);
