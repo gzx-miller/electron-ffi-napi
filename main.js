@@ -34,6 +34,9 @@ function createWindow () {
   mainWin.on('closed', () => {
     mainWin = null;
   });
+  mainWin.on('move', () => {
+    mainWin.webContents.send("window_move");
+  });
 }
 
 // app.disableDomainBlockingFor3DAPIs();

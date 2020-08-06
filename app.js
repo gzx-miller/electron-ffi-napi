@@ -17,6 +17,19 @@ function getPlayerPos() {
   console.log(`getPlayerPos: ${playerX}, ${playerY}`)
 }
 
+let winLeft = 0, winTop = 0;
+function getWinPos() {
+  if (window.screenLeft < -5000 ||
+      window.screenTop < -5000 || (
+      winLeft === window.screenLeft &&
+      winTop === window.screenTop)) {
+        return false;
+  }
+  winLeft = window.screenLeft;
+  winTop = window.screenTop;
+  return true;
+}
+
 let scrollTop = 0;
 
 function test_ffi_napi() {
@@ -63,8 +76,8 @@ function observePlayerSize() {
   container.addEventListener("scroll", (ev) => {  // TestCode: change dom pos
     console.log("on scroll: " + container.scrollTop);
     scrollTop = container.scrollTop;
-    let x = playerX;
-    let y = playerY - scrollTop;
+    let x = winLeft + playerX;
+    let y = winTop + playerY - scrollTop;
     window.ffi_napi.set_win_pos(x, y);
   });
 
@@ -104,12 +117,20 @@ function regClick() {
 
 ipcRenderer.on("window_closed", () =>{
   window.ffi_napi.quit_win();
-})
+});
+ipcRenderer.on("window_move", (ev, arg)=>{
+  if (!getWinPos()) return false;
+  let x = winLeft + playerX;
+  let y = winTop + playerY - scrollTop;
+  console.log(`on recv window_move: ${x}, ${y}`);
+  window.ffi_napi.set_win_pos(x, y);
+});
 
 function initWin() {
   let hwnd = ipcRenderer.sendSync('getWindowId');
   window.player = document.getElementById("player");
   getPlayerPos();
+  getWinPos();
   console.log(`initWin: ${playerX}, ${playerY}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
   window.ffi_napi.create_win(playerX, playerY, player.clientWidth, player.clientHeight, hwnd);
 }
