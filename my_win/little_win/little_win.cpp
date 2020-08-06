@@ -27,6 +27,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_MOVE:
+        sprintLog("on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -62,7 +64,7 @@ bool onRcvMsg(MsgStruct & msg) {
 MsgClient msgClient(sizeof(MsgStruct), onRcvMsg);
 void __cdecl threadProc(void*) {
     while (!g_bExit) {
-        msgClient.WaitMsg();
+        msgClient.WaitMsg(100);
     }
 }
 
@@ -80,18 +82,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     
     // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
     if (hwnd_parent == NULL) {
-        g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
+        g_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
             "MyWinClass", "MyWinTitle",
             WS_POPUPWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-            x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
+            x, y, w, h, nullptr, nullptr, hInstance, nullptr);
     } else {
         long style = GetWindowLong(hwnd_parent, GWL_STYLE);
         style |= WS_CLIPCHILDREN;
         SetWindowLong(hwnd_parent, GWL_STYLE, style);
-        g_hwnd = CreateWindowEx(WS_EX_TOPMOST,
+        g_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
             "MyWinClass", "MyWinTitle",
-            WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-            x, y, w, h, hwnd_parent, nullptr, hInstance, nullptr);
+            WS_POPUPWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+            x, y, w, h, nullptr, nullptr, hInstance, nullptr);
     }
 
     if (!g_hwnd) return FALSE;

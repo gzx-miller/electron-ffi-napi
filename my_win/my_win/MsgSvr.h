@@ -46,7 +46,7 @@ public:
     MsgSvr(int bufSize, PFRcvMsg onRcvMsg) : _bufSize(bufSize),
         _onRcvMsg(onRcvMsg) { }
     ~MsgSvr() { Unint(); }
-    bool Listen(string name);
+    bool Listen(string name, int time = INFINITE);
     bool Unint();
     bool WaitMsg(int time = INFINITE);
     bool PostMsg(MsgStruct &msg);

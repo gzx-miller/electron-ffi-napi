@@ -11,7 +11,8 @@ function createWindow () {
     minWidth: 400,
     minHeight: 300,
     frame: false,
-    // transparent: false,
+    transparent: true,
+    backgroundColor: '#00000000',
     alwaysOnTop: false,
     title:"my_electron_win",
     webPreferences: {
@@ -28,7 +29,7 @@ function createWindow () {
     slashes: true
   }))
 
-  mainWin.webContents.openDevTools();
+  //mainWin.webContents.openDevTools();
 
   mainWin.on('closed', () => {
     mainWin = null;

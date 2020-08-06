@@ -6,8 +6,7 @@ bool EvtSvr::Create(string name) {
 }
 
 bool EvtSvr::Wait(DWORD time) {
-    if (_hEvent) WaitForSingleObject(_hEvent, time);
-    return true;
+    return _hEvent && WAIT_OBJECT_0 == WaitForSingleObject(_hEvent, time);
 }
 
 bool EvtSvr::Signal() {
@@ -20,10 +19,10 @@ bool EvtSvr::Uninit() {
     return true;
 }
 
-bool MsgSvr::Listen(string name) {
+bool MsgSvr::Listen(string name, int time) {
     string strGlobal = "Local\\";
     _evtSvr.Create((strGlobal + name + string("_event")).c_str());
-    _evtSvr.Wait();
+    if (!_evtSvr.Wait(time)) return false;
 
     _hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE,
         (strGlobal + name).c_str());

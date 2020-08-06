@@ -34,8 +34,7 @@ bool EvtClient::Connect(string name) {
 }
 
 bool EvtClient::Wait(DWORD time /*= INFINITE*/) {
-    if (_hEvent) WaitForSingleObject(_hEvent, time);
-    return true;
+    return _hEvent && WAIT_OBJECT_0 == WaitForSingleObject(_hEvent, time);
 }
 
 bool EvtClient::Signal() {

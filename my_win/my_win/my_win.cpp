@@ -3,12 +3,15 @@
 #include "windows.h"
 #include "stdio.h"
 #include <sstream>
+#include <process.h>
 #include "MsgSvr.h"
+
 using namespace std;
 
 #define WM_CREATE_WIN WM_USER + 1
 #define WM_SET_WIN_POS WM_USER + 2
 #define WM_SHOW_WIN WM_USER + 3
+
 
 static void WriteToDebug(const char* buffer, size_t size) {
     static HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -47,6 +50,37 @@ void RunJsCallback() {
 }
 
 HWND g_hwnd = NULL;
+typedef LRESULT (* CALLBACK PFWndProc)(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+LONG g_oldWinProc = NULL;
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
+    case WM_DESTROY:
+        sprintLog("on rcv WM_DESTROY: %x,%x \r\n", wParam, lParam);
+        break;
+    case WM_MOVE:
+        sprintLog("on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
+        break;
+    case WM_SYSCOMMAND:
+        if (wParam == SC_MINIMIZE) {
+            sprintLog("on rcv SC_MINIMIZE: %x,%x \r\n", wParam, lParam);
+        } else if (wParam == SC_MOVE){
+            sprintLog("on rcv SC_MOVE: %x,%x \r\n", wParam, lParam);
+        } else if (wParam == SC_RESTORE) {
+            sprintLog("on rcv SC_RESTORE: %x,%x \r\n", wParam, lParam);
+        }
+        break;
+    case WM_ACTIVATE:
+        sprintLog("on rcv WM_ACTIVATE: %x,%x \r\n", wParam, lParam);
+        break;
+    case WM_SETFOCUS: 
+        sprintLog("on rcv WM_SETFOCUS: %x,%x \r\n", wParam, lParam);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_win_hwnd) {
         g_hwnd = (HWND)msg.x;
@@ -55,6 +89,13 @@ bool onRcvMsg(MsgStruct & msg) {
     return true;
 }
 MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
+bool g_bExit = false;
+void __cdecl threadProc(void*) {
+    if (!msgSvr.Listen("player_win", 2000)) return;
+    while (!g_bExit) {
+        msgSvr.WaitMsg(100);
+    }
+}
 
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
@@ -76,9 +117,10 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
     ShExecInfo.hInstApp = NULL;
     ShellExecuteEx(&ShExecInfo);
 
-    msgSvr.Listen("player_win");    // Listen can rcv one time.
-    // msgSvr.WaitMsg();
+    UINT32 threadID;
+    HANDLE hThread = (HANDLE)_beginthread(threadProc, 0, 0);
 
+    g_oldWinProc = GetWindowLong((HWND)hwnd, GWL_WNDPROC);
     return true;
 }
 
@@ -133,8 +175,14 @@ DLL_API bool quit_win() {
     msgSvr.PostMsg(msg);
 
     sprintLog("quit_win: \r\n");
-    if (!g_hwnd) return false;
-    PostMessage(g_hwnd, WM_DESTROY, 0, 0);
+    //if (!g_hwnd) return false;
+    //PostMessage(g_hwnd, WM_DESTROY, 0, 0);
+
+    g_bExit = true;
     return true;
 }
+
+//GetWindowLong(hwnd, GWL_WNDPROC)                  // 获取原窗口处理  
+//SetWindowLong(hwnd, GWL_WNDPROC, MyWindowProc)    // 替换窗口处理
+
 
