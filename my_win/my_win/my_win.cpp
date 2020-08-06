@@ -112,7 +112,7 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
     ShExecInfo.lpVerb = "open";
     ShExecInfo.lpFile = "little_win.exe";
     ShExecInfo.lpParameters = ostr.str().c_str();
-    ShExecInfo.lpDirectory = "D:/DCode/electron/electron-ffi-napi/my_win/Release/";
+    ShExecInfo.lpDirectory = "./my_win/Release/";
     ShExecInfo.nShow = SW_NORMAL;
     ShExecInfo.hInstApp = NULL;
     ShellExecuteEx(&ShExecInfo);
