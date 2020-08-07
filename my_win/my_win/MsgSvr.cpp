@@ -22,7 +22,7 @@ bool EvtSvr::Uninit() {
 bool MsgSvr::Listen(string name, int time) {
     string strGlobal = "Local\\";
     _evtSvr.Create((strGlobal + name + string("_event")).c_str());
-    if (!_evtSvr.Wait(time)) return false;
+    if (!_evtSvr.Wait()) return false;
 
     _hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE,
         (strGlobal + name).c_str());
@@ -41,7 +41,7 @@ bool MsgSvr::Unint() {
 }
 
 bool MsgSvr::WaitMsg(int time) {
-    _evtSvr.Wait(time);
+    if (!_evtSvr.Wait()) return false;
     if (_onRcvMsg) _onRcvMsg(*((MsgStruct*)_pBuf));
     return true;
 }

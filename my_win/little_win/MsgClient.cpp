@@ -67,7 +67,7 @@ bool MsgClient::Unint() {
 }
 
 bool MsgClient::WaitMsg(int time /*= INFINITE*/) {
-    _evtClient.Wait(time);
+    if (!_evtClient.Wait()) return false;
     if (_onRcvMsg && _pBuf) _onRcvMsg(*((MsgStruct*)_pBuf));
     return true;
 }
