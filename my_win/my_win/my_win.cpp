@@ -31,20 +31,20 @@ void sprintLog(const char *format, ...) {
     va_start(ap, format);
     _vsnprintf_s(strBuf, sizeof(strBuf) - 1, format, ap);
     va_end(ap);
-    WriteToDebug(strBuf, strlen(strBuf));
+    //WriteToDebug(strBuf, strlen(strBuf));
     OutputDebugStringA(strBuf);
 }
 
 PFCallback g_cb = nullptr;
 DLL_API void set_callback(PFCallback cb) {
-    sprintLog("set_callback: %x \r\n", cb);
+    sprintLog("[ele-ffi] set_callback: %x \r\n", cb);
     g_cb = cb;
 }
 void RunJsCallback() {
-    sprintLog("callback begin: %x \r\n", g_cb);
+    sprintLog("[ele-ffi] callback begin: %x \r\n", g_cb);
     if (g_cb) {
         int ret = g_cb(123);
-        sprintLog("callback ret: %d \r\n", ret);
+        sprintLog("[ele-ffi] callback ret: %d \r\n", ret);
         // g_cb = nullptr;
     }
 }
@@ -55,25 +55,25 @@ LONG g_oldWinProc = NULL;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
     case WM_DESTROY:
-        sprintLog("on rcv WM_DESTROY: %x,%x \r\n", wParam, lParam);
+        sprintLog("[ele-ffi] on rcv WM_DESTROY: %x,%x \r\n", wParam, lParam);
         break;
     case WM_MOVE:
-        sprintLog("on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
+        sprintLog("[ele-ffi] on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
         break;
     case WM_SYSCOMMAND:
         if (wParam == SC_MINIMIZE) {
-            sprintLog("on rcv SC_MINIMIZE: %x,%x \r\n", wParam, lParam);
+            sprintLog("[ele-ffi] on rcv SC_MINIMIZE: %x,%x \r\n", wParam, lParam);
         } else if (wParam == SC_MOVE){
-            sprintLog("on rcv SC_MOVE: %x,%x \r\n", wParam, lParam);
+            sprintLog("[ele-ffi] on rcv SC_MOVE: %x,%x \r\n", wParam, lParam);
         } else if (wParam == SC_RESTORE) {
-            sprintLog("on rcv SC_RESTORE: %x,%x \r\n", wParam, lParam);
+            sprintLog("[ele-ffi] on rcv SC_RESTORE: %x,%x \r\n", wParam, lParam);
         }
         break;
     case WM_ACTIVATE:
-        sprintLog("on rcv WM_ACTIVATE: %x,%x \r\n", wParam, lParam);
+        sprintLog("[ele-ffi] on rcv WM_ACTIVATE: %x,%x \r\n", wParam, lParam);
         break;
     case WM_SETFOCUS: 
-        sprintLog("on rcv WM_SETFOCUS: %x,%x \r\n", wParam, lParam);
+        sprintLog("[ele-ffi] on rcv WM_SETFOCUS: %x,%x \r\n", wParam, lParam);
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -85,7 +85,7 @@ bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_win_hwnd) {
         g_hwnd = (HWND)msg.x;
     }
-    sprintLog("MsgSvr onRcvMsg: %d,%x \r\n", msg.type);
+    sprintLog("[ele-ffi] MsgSvr onRcvMsg: %d,%x \r\n", msg.type);
     return true;
 }
 MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
@@ -101,7 +101,7 @@ int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
     
     lastX = x; lastY = y; lastW = w; lastH = h;
-    sprintLog("create_win: %d,%d,%d,%d,%x \r\n", x, y, w, h, hwnd);
+    sprintLog("[ele-ffi] create_win: %d,%d,%d,%d,%x \r\n", x, y, w, h, hwnd);
     ostringstream ostr;
     ostr << x << "," << y << "," << w << "," << h << ',' << hwnd;
 
@@ -125,7 +125,7 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
 }
 
 DLL_API bool set_win_pos(int x, int y) {
-    sprintLog("set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
+    sprintLog("[ele-ffi] set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
     
     if (!g_hwnd) return false;
     lastX = x; lastY = y;
@@ -145,7 +145,7 @@ DLL_API bool set_win_pos(int x, int y) {
 }
 
 DLL_API bool set_win_size(int w, int h) {
-    sprintLog("set_win_size: %d,%d,%x \r\n", w, h, g_hwnd);
+    sprintLog("[ele-ffi] set_win_size: %d,%d,%x \r\n", w, h, g_hwnd);
     if (!g_hwnd) return false;
     lastW = w; lastH = h;
     MsgStruct msg;
@@ -163,7 +163,7 @@ DLL_API bool set_win_size(int w, int h) {
 }
 
 DLL_API bool show_win(int show) {
-    sprintLog("show_win: %d,%x \r\n", show, g_hwnd);
+    sprintLog("[ele-ffi] show_win: %d,%x \r\n", show, g_hwnd);
 //    if (!g_hwnd) return false;
 //    PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
     return true;
@@ -174,7 +174,7 @@ DLL_API bool quit_win() {
     msg.type = msg_exit;
     msgSvr.PostMsg(msg);
 
-    sprintLog("quit_win: \r\n");
+    sprintLog("[ele-ffi] quit_win: \r\n");
     //if (!g_hwnd) return false;
     //PostMessage(g_hwnd, WM_DESTROY, 0, 0);
 

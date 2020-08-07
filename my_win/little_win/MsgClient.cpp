@@ -19,7 +19,7 @@ void sprintLog(const char *format, ...) {
     va_start(ap, format);
     _vsnprintf_s(strBuf, sizeof(strBuf) - 1, format, ap);
     va_end(ap);
-    WriteToDebug(strBuf, strlen(strBuf));
+    // WriteToDebug(strBuf, strlen(strBuf));
     OutputDebugStringA(strBuf);
 }
 
@@ -29,7 +29,7 @@ EvtClient::~EvtClient() {
 
 bool EvtClient::Connect(string name) {
     _hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, name.c_str());
-    sprintLog("EvtClient::Connect: %x \r\n", _hEvent);
+    sprintLog("[ele-ffi] EvtClient::Connect: %x \r\n", _hEvent);
     return _hEvent != NULL;
 }
 
@@ -38,7 +38,7 @@ bool EvtClient::Wait(DWORD time /*= INFINITE*/) {
 }
 
 bool EvtClient::Signal() {
-    sprintLog("EvtClient::Signal: %x \r\n", _hEvent);
+    sprintLog("[ele-ffi] EvtClient::Signal: %x \r\n", _hEvent);
     if (_hEvent) SetEvent(_hEvent);
     return true;
 }

@@ -24,12 +24,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         EndPaint(hWnd, &ps);
     }
     break;
+    case WM_CLOSE:
+        DestroyWindow(g_hwnd);
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
     case WM_MOVE:
 
-        sprintLog("on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
+        sprintLog("[ele-ffi] on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -55,9 +58,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 bool g_bExit = false;
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_new_win_pos) {
-        sprintLog("MsgClient onRcvMsg: %d,%d,%d,%d,%d \r\n", msg.type, msg.x, msg.y, msg.w, msg.h);
+        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d \r\n", msg.type, msg.x, msg.y, msg.w, msg.h);
         SetWindowPos(g_hwnd, HWND_TOP, msg.x, msg.y, msg.w, msg.h, SWP_SHOWWINDOW);
     } else if (msg.type == msg_exit) {
+        sprintLog("[ele-ffi] MsgClient onRcvMsg msg_exit \r\n");
         g_bExit = true;
     }
     return true;
@@ -67,6 +71,7 @@ void __cdecl threadProc(void*) {
     while (!g_bExit) {
         msgClient.WaitMsg(100);
     }
+    ExitProcess(0);
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
@@ -79,7 +84,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     string strParams = strCmd.substr(f);
     sscanf(strParams.c_str(), "%d,%d,%d,%d,%d",
         &x, &y, &w, &h, &hwnd_parent);
-    sprintLog("InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_parent);
+    sprintLog("[ele-ffi] InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_parent);
     
     // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
     if (hwnd_parent == NULL) {

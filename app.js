@@ -75,6 +75,7 @@ function observePlayerSize() {
   var container = document.getElementById("container");
   container.addEventListener("scroll", (ev) => {  // TestCode: change dom pos
     console.log("on scroll: " + container.scrollTop);
+    getWinPos();
     scrollTop = container.scrollTop;
     let x = winLeft + playerX;
     let y = winTop + playerY - scrollTop;
