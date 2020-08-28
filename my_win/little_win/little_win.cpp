@@ -31,7 +31,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         PostQuitMessage(0);
         break;
     case WM_MOVE:
-
         sprintLog("[ele-ffi] on rcv WM_MOVE: %x,%x \r\n", wParam, lParam);
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -71,7 +70,8 @@ void __cdecl threadProc(void*) {
     while (!g_bExit) {
         msgClient.WaitMsg(100);
     }
-    ExitProcess(0);
+	sprintLog("[ele-ffi] DestroyWindow \r\n");
+	PostMessage(g_hwnd, WM_DESTROY, 0, 0);
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {

@@ -92,9 +92,9 @@ MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
 bool g_bExit = false;
 void __cdecl threadProc(void*) {
     if (!msgSvr.Listen("player_win", 2000)) return;
-    while (!g_bExit) {
-        msgSvr.WaitMsg(100);
-    }
+    //while (!g_bExit) {
+    //    msgSvr.WaitMsg(100);
+    //}
 }
 
 int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
@@ -127,7 +127,7 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
 DLL_API bool set_win_pos(int x, int y) {
     sprintLog("[ele-ffi] set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
     
-    if (!g_hwnd) return false;
+    //if (!g_hwnd) return false;
     lastX = x; lastY = y;
 
     MsgStruct msg;
@@ -146,7 +146,7 @@ DLL_API bool set_win_pos(int x, int y) {
 
 DLL_API bool set_win_size(int w, int h) {
     sprintLog("[ele-ffi] set_win_size: %d,%d,%x \r\n", w, h, g_hwnd);
-    if (!g_hwnd) return false;
+    //if (!g_hwnd) return false;
     lastW = w; lastH = h;
     MsgStruct msg;
     msg.type = set_new_win_pos;
