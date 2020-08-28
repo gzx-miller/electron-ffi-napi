@@ -16,6 +16,7 @@ int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
 
 HWND g_hwnd;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	sprintLog("[ele-ffi] on rcv: %x, %x, %x \r\n", message, wParam, lParam);
     switch (message) {
     case WM_PAINT: {
         PAINTSTRUCT ps;
@@ -59,10 +60,14 @@ bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_new_win_pos) {
         sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d \r\n", msg.type, msg.x, msg.y, msg.w, msg.h);
         SetWindowPos(g_hwnd, HWND_TOP, msg.x, msg.y, msg.w, msg.h, SWP_SHOWWINDOW);
-    } else if (msg.type == msg_exit) {
-        sprintLog("[ele-ffi] MsgClient onRcvMsg msg_exit \r\n");
+    } else if (msg.type == set_exit) {
+        sprintLog("[ele-ffi] MsgClient onRcvMsg set_exit \r\n");
         g_bExit = true;
-    }
+	}
+	else if (msg.type == set_show) {
+		sprintLog("[ele-ffi] MsgClient onRcvMsg set_show, %d \r\n", msg.x);
+		ShowWindow(g_hwnd, (int)msg.x);
+	}
     return true;
 }
 MsgClient msgClient(sizeof(MsgStruct), onRcvMsg);

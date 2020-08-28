@@ -40,6 +40,7 @@ function test_ffi_napi() {
       create_win: ["bool", ["int", "int", "int", "int", "int"]],
       set_win_pos: ["bool", ["int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
+      show_win: ["bool", ["int"]],
       quit_win: ["bool", []],
       set_callback: ['void', ['pointer']]
     });
@@ -110,6 +111,8 @@ function regClick() {
   };
   document.querySelector('#min_btn').onclick = () => {
       ipcRenderer.send('switch_min', '');
+      console.log(`switch_min`);
+      window.ffi_napi.show_win(1);
   };
   document.querySelector('#close_btn').onclick = () => {
     window.close();
@@ -119,6 +122,7 @@ function regClick() {
 ipcRenderer.on("window_closed", () =>{
   window.ffi_napi.quit_win();
 });
+
 ipcRenderer.on("window_move", (ev, arg)=>{
   if (!getWinPos()) return false;
   let x = winLeft + playerX;

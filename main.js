@@ -14,6 +14,7 @@ function createWindow () {
     transparent: true,
     backgroundColor: '#00000000',
     alwaysOnTop: false,
+    skipTaskbar: true,                 // hide button on task bar
     title:"my_electron_win",
     webPreferences: {
       nodeIntegration: true,
@@ -59,8 +60,8 @@ app.on('activate', () => {
 })
 
 ipcMain.on('switch_min', (event, arg) => {
-  let isMini = mainWin.isMinimized();
-  if(!isMini) mainWin.minimize();
+  // let isMini = mainWin.isMinimized();
+  // if(!isMini) mainWin.minimize();
 });
 
 let isMaxed  = false;

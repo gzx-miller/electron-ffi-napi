@@ -23,7 +23,8 @@ public:
 enum MsgType {
     set_win_hwnd = 1,
     set_new_win_pos = 2,
-    msg_exit = 3
+    set_exit = 3,
+	set_show = 4
 };
 struct MsgStruct {
     MsgType type;

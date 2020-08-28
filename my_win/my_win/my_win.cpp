@@ -163,6 +163,13 @@ DLL_API bool set_win_size(int w, int h) {
 }
 
 DLL_API bool show_win(int show) {
+	if (show == 1) {
+		MsgStruct msg;
+		msg.type = set_show;
+		msg.x = SW_MINIMIZE;
+		msgSvr.PostMsg(msg);
+	}
+
     sprintLog("[ele-ffi] show_win: %d,%x \r\n", show, g_hwnd);
 //    if (!g_hwnd) return false;
 //    PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
@@ -171,7 +178,7 @@ DLL_API bool show_win(int show) {
 
 DLL_API bool quit_win() {
     MsgStruct msg;
-    msg.type = msg_exit;
+    msg.type = set_exit;
     msgSvr.PostMsg(msg);
 
     sprintLog("[ele-ffi] quit_win: \r\n");
