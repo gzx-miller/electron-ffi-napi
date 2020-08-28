@@ -77,34 +77,28 @@ void __cdecl threadProc(void*) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
     int x = 0, y = 0, w = 400, h = 300;
-    HWND hwnd_parent = (HWND)0;
-    // sprintLog(cmdLine, strlen(cmdLine));
+    HWND hwnd_eletron = (HWND)0;
     string strCmd(cmdLine);
     int f = strCmd.find(' ');
     string strParams = strCmd.substr(f);
     sscanf(strParams.c_str(), "%d,%d,%d,%d,%d",
-        &x, &y, &w, &h, &hwnd_parent);
-    sprintLog("[ele-ffi] InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_parent);
+        &x, &y, &w, &h, &hwnd_eletron);
+    sprintLog("[ele-ffi] InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_eletron);
     
-    // hwnd_parent = FindWindow("Chrome_WidgetWin_1", "my_electron_win");
-    if (hwnd_parent == NULL) {
-        g_hwnd = CreateWindowEx(WS_EX_WINDOWEDGE,
-            "MyWinClass", "MyWinTitle",
-            WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-            x, y, w, h, nullptr, nullptr, hInstance, nullptr);
-    } else {
-        long style = GetWindowLong(hwnd_parent, GWL_STYLE);
+    if (hwnd_eletron != NULL) {
+        long style = GetWindowLong(hwnd_eletron, GWL_STYLE);
         style |= (WS_CLIPCHILDREN | WS_POPUP);
-        SetWindowLong(hwnd_parent, GWL_STYLE, style);
-        g_hwnd = CreateWindowEx(WS_EX_WINDOWEDGE,
-            "MyWinClass", "MyWinTitle",
-            WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-            x, y, w, h, nullptr, nullptr, hInstance, nullptr);
+        SetWindowLong(hwnd_eletron, GWL_STYLE, style);
     }
 
+	g_hwnd = CreateWindowEx(WS_EX_WINDOWEDGE,
+		"MyWinClass", "MyWinTitle",
+		WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+		x, y, w, h, nullptr, nullptr, hInstance, nullptr);
     if (!g_hwnd) return FALSE;
 
-    SetWindowLongPtr(hwnd_parent, GWLP_HWNDPARENT, (LONG)g_hwnd);
+    SetWindowLongPtr(hwnd_eletron, GWLP_HWNDPARENT, (LONG)g_hwnd);
+
     msgClient.Connect(string("player_win"));
     MsgStruct msg;
     msg.type = set_win_hwnd;

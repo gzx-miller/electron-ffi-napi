@@ -132,8 +132,10 @@ function initWin() {
   window.player = document.getElementById("player");
   getPlayerPos();
   getWinPos();
-  console.log(`initWin: ${playerX}, ${playerY}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
-  window.ffi_napi.create_win(playerX, playerY, player.clientWidth, player.clientHeight, hwnd);
+  let x = winLeft + playerX;
+  let y = winTop + playerY - scrollTop;
+  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
+  window.ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight, hwnd);
 }
 window.onload = () => {
   test_ffi_napi();
