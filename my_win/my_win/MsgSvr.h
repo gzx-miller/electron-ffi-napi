@@ -16,9 +16,12 @@ enum MsgType {
 struct MsgStruct {
     MsgType type;
     int x;
-    int y;
+	int y;
+	int x_;
+	int y_;
     int w;
     int h;
+	int offset;
 };
 
 class EvtSvr {

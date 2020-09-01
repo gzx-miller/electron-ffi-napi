@@ -37,8 +37,8 @@ function test_ffi_napi() {
     let ffi = require("ffi-napi");
     var ref = require("ref-napi");
     window.ffi_napi = ffi.Library("my_win/release/my_win.dll", {
-      create_win: ["bool", ["int", "int", "int", "int", "int"]],
-      set_win_pos: ["bool", ["int", "int"]],
+      create_win: ["bool", ["int", "int", "int", "int", "int", "int", "int"]],
+      set_win_pos: ["bool", ["int", "int", "int", "int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
       show_win: ["bool", ["int"]],
       quit_win: ["bool", []],
@@ -78,9 +78,9 @@ function observePlayerSize() {
     console.log("on scroll: " + container.scrollTop);
     getWinPos();
     scrollTop = container.scrollTop;
-    let x = winLeft + playerX;
-    let y = winTop + playerY - scrollTop;
-    window.ffi_napi.set_win_pos(x, y);
+    // let x = winLeft + playerX;
+    // let y = winTop + playerY - scrollTop;
+    window.ffi_napi.set_win_pos(winLeft, winTop, playerX, playerY, scrollTop);
   });
 
   let preWidth = 0, preHeight = 0;
@@ -125,10 +125,10 @@ ipcRenderer.on("window_closed", () =>{
 
 ipcRenderer.on("window_move", (ev, arg)=>{
   if (!getWinPos()) return false;
-  let x = winLeft + playerX;
-  let y = winTop + playerY - scrollTop;
-  console.log(`on recv window_move: ${x}, ${y}`);
-  window.ffi_napi.set_win_pos(x, y);
+  // let x = winLeft + playerX;
+  // let y = winTop + playerY - scrollTop;
+  // console.log(`on recv window_move: ${x}, ${y}`);
+  window.ffi_napi.set_win_pos(winLeft, winTop, playerX, playerY, scrollTop);
 });
 
 function initWin() {
@@ -136,10 +136,14 @@ function initWin() {
   window.player = document.getElementById("player");
   getPlayerPos();
   getWinPos();
-  let x = winLeft + playerX;
-  let y = winTop + playerY - scrollTop;
-  console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
-  window.ffi_napi.create_win(x, y, player.clientWidth, player.clientHeight, hwnd);
+  // let x = winLeft + playerX;
+  // let y = winTop + playerY - scrollTop;
+  // console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
+  window.ffi_napi.create_win(
+    winLeft, winTop, 
+    playerX, playerY, 
+    player.clientWidth, player.clientHeight, 
+    hwnd);
 }
 window.onload = () => {
   test_ffi_napi();

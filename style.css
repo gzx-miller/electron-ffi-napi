@@ -20,10 +20,10 @@ body {
     background: #2ecc717f;
 }
 
-.bottom {
+.blank {
     position: relative;
-    margin: 20px;
-    height: 50%;
+    margin: 40px;
+    height: 60%;
 }
 
 .header {

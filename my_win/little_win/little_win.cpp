@@ -1,6 +1,6 @@
 ﻿// little_win.cpp : 定义应用程序的入口点。
 //
-
+#include <afxwin.h>
 #include "framework.h"
 #include <string>
 #include "little_win.h"
@@ -12,21 +12,35 @@ using namespace std;
 #define WM_SET_WIN_POS WM_USER + 2
 #define WM_SHOW_WIN WM_USER + 3
 
-int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
-
 HWND g_hwnd;
+LRESULT PaintImage(HWND hWnd, int offset) {
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hWnd, &ps);
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HANDLE hBmp = LoadImage(NULL, "./1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	HGDIOBJ hOldSel = SelectObject(hdcMem, hBmp);
+
+	BITMAP bmp;//??
+	GetObject(hBmp, sizeof(BITMAP), &bmp);
+
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+	BitBlt(hdc, rc.left, rc.top - offset, (rc.right-rc.left), (rc.bottom - rc.top), hdcMem, 0, 0, SRCCOPY);
+	SelectObject(hdcMem, hOldSel);
+	DeleteDC(hdcMem);
+	EndPaint(hWnd, &ps);
+	return 0;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	sprintLog("[ele-ffi] on rcv: %x, %x, %x \r\n", message, wParam, lParam);
     switch (message) {
     case WM_PAINT: {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        // TODO: 在此处添加使用 hdc 的任何绘图代码...
-        EndPaint(hWnd, &ps);
+		PaintImage(hWnd, 0);
     }
     break;
     case WM_CLOSE:
-        DestroyWindow(g_hwnd);
+        DestroyWindow(hWnd);
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -55,11 +69,21 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
     return RegisterClassEx(&wcex);
 }
 
+BOOL SetWinNewPos(int x, int y, int w, int h) {
+	return SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
+}
 bool g_bExit = false;
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_new_win_pos) {
-        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d \r\n", msg.type, msg.x, msg.y, msg.w, msg.h);
-        SetWindowPos(g_hwnd, HWND_TOP, msg.x, msg.y, msg.w, msg.h, SWP_SHOWWINDOW);
+        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d \r\n", 
+			msg.type, msg.x, msg.y, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
+		if (msg.x_ >= msg.offset) {
+			SetWinNewPos(msg.x + msg.x_, msg.y + msg.y_ - msg.offset, msg.w, msg.h);
+		}
+		else if (msg.x_ < msg.offset) {
+			SetWinNewPos(msg.x + msg.x_, msg.y, msg.w, 
+				max(0, msg.y_ + msg.h - msg.offset));
+		}
     } else if (msg.type == set_exit) {
         sprintLog("[ele-ffi] MsgClient onRcvMsg set_exit \r\n");
         g_bExit = true;
@@ -81,21 +105,23 @@ void __cdecl threadProc(void*) {
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
-    int x = 0, y = 0, w = 400, h = 300;
+    int winX = 0, winY = 0, domX = 0, domY = 0, w = 0, h = 0;
     HWND hwnd_eletron = (HWND)0;
     string strCmd(cmdLine);
     int f = strCmd.find(' ');
     string strParams = strCmd.substr(f);
-    sscanf(strParams.c_str(), "%d,%d,%d,%d,%d",
-        &x, &y, &w, &h, &hwnd_eletron);
-    sprintLog("[ele-ffi] InitInstance: %d,%d,%d,%d,0x%x \r\n", x, y, w, h, hwnd_eletron);
-    
+    sscanf(strParams.c_str(), "%d,%d,%d,%d,%d,%d,%d",
+        &winX, &winY, &domX, &domY, &w, &h, &hwnd_eletron);
+    sprintLog("[ele-ffi] InitInstance: (%d,%d),(%d,%d),[%d,%d], 0x%x \r\n", 
+		winX, winY, domX, domY, w, h, hwnd_eletron);
+
     if (hwnd_eletron != NULL) {
         long style = GetWindowLong(hwnd_eletron, GWL_STYLE);
         style |= (WS_CLIPCHILDREN | WS_POPUP);
         SetWindowLong(hwnd_eletron, GWL_STYLE, style);
     }
-
+	int x = winX + domX;
+	int y = winY + domY;
 	g_hwnd = CreateWindowEx(WS_EX_WINDOWEDGE,
 		"MyWinClass", "MyWinTitle",
 		WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,

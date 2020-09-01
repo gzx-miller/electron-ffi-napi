@@ -28,10 +28,13 @@ enum MsgType {
 };
 struct MsgStruct {
     MsgType type;
-    int x;
-    int y;
-    int w;
-    int h;
+	int x;
+	int y;
+	int x_;
+	int y_;
+	int w;
+	int h;
+	int offset;
 };
 
 typedef bool(*PFRcvMsg)(MsgStruct & msg);

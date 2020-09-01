@@ -89,21 +89,23 @@ bool onRcvMsg(MsgStruct & msg) {
     return true;
 }
 MsgSvr msgSvr(sizeof(MsgStruct), onRcvMsg);
-bool g_bExit = false;
 void __cdecl threadProc(void*) {
     if (!msgSvr.Listen("player_win", 2000)) return;
-    //while (!g_bExit) {
-    //    msgSvr.WaitMsg(100);
-    //}
 }
 
-int lastX = 0, lastY = 0, lastW = 0, lastH = 0;
-DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
-    
-    lastX = x; lastY = y; lastW = w; lastH = h;
-    sprintLog("[ele-ffi] create_win: %d,%d,%d,%d,%x \r\n", x, y, w, h, hwnd);
+int lastWinX = 0, lastWinY = 0;
+int lastDomX = 0, lastDomY = 0;
+int lastW = 0, lastH = 0;
+int lastScrollTop = 0;
+DLL_API bool create_win(int winX, int winY, int domX, int domY, int w, int h, int hwnd) {
+    lastWinX = winX; lastWinY = winY; 
+	lastDomX = domX; lastDomY = domY;
+	lastW = w; lastH = h;
+    sprintLog("[ele-ffi] create_win: (%d,%d),(%d,%d),[%d,%d],%x \r\n",
+		winX, winY, domX, domY, w, h, hwnd);
     ostringstream ostr;
-    ostr << x << "," << y << "," << w << "," << h << ',' << hwnd;
+    ostr << winX << "," << winY << "," << domX << "," << domY << "," 
+		 << w << "," << h << ',' << hwnd;
 
     SHELLEXECUTEINFO ShExecInfo;
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
@@ -124,72 +126,72 @@ DLL_API bool create_win(int x, int y, int w, int h, int hwnd) {
     return true;
 }
 
-DLL_API bool set_win_pos(int x, int y) {
-    sprintLog("[ele-ffi] set_win_pos: %d,%d,%x \r\n", x, y, g_hwnd);
-    
-    //if (!g_hwnd) return false;
-    lastX = x; lastY = y;
+DLL_API bool set_win_pos(int winX, int winY, int domX, int domY, int scrollTop) {
+	lastWinX = winX; lastWinY = winY;
+	lastDomX = domX; lastDomY = domY;
+	lastScrollTop = scrollTop;
+	sprintLog("[ele-ffi] set_win_pos: (%d,%d),(%d,%d),%d,%x \r\n",
+		winX, winY, domX, domY, scrollTop, g_hwnd);
 
     MsgStruct msg;
     msg.type = set_new_win_pos;
-    msg.x = lastX; 
-    msg.y = lastY;
+    msg.x = lastWinX; 
+	msg.y = lastWinY;
+	msg.x_ = lastDomX;
+	msg.y_ = lastDomY;
     msg.w = lastW;
     msg.h = lastH;
+	msg.offset = lastScrollTop;
     msgSvr.PostMsg(msg);
+	//    if (!g_hwnd) return false;
     //PostMessage(g_hwnd, WM_SET_WIN_POS, 
     //    (lastX << 16) | lastY, (lastW << 16) | lastH);
-
-    RunJsCallback();
+    //RunJsCallback();
     return true;
 }
 
 DLL_API bool set_win_size(int w, int h) {
-    sprintLog("[ele-ffi] set_win_size: %d,%d,%x \r\n", w, h, g_hwnd);
+    sprintLog("[ele-ffi] set_win_size: [%d,%d],%x \r\n", w, h, g_hwnd);
     //if (!g_hwnd) return false;
     lastW = w; lastH = h;
     MsgStruct msg;
     msg.type = set_new_win_pos;
-    msg.x = lastX;
-    msg.y = lastY;
-    msg.w = lastW;
-    msg.h = lastH;
+	msg.x = lastWinX;
+	msg.y = lastWinY;
+	msg.x_ = lastDomX;
+	msg.y_ = lastDomY;
+	msg.w = lastW;
+	msg.h = lastH;
+	msg.offset = lastScrollTop;
     msgSvr.PostMsg(msg);
     //PostMessage(g_hwnd, WM_SET_WIN_POS, 
     //    (lastX << 16) | lastY, (lastW << 16) | lastH);
-
-    RunJsCallback();
+    //RunJsCallback();
     return true;
 }
 
 DLL_API bool show_win(int show) {
+	sprintLog("[ele-ffi] show_win: %d,%x \r\n", show, g_hwnd);
 	if (show == 1) {
 		MsgStruct msg;
 		msg.type = set_show;
 		msg.x = SW_MINIMIZE;
 		msgSvr.PostMsg(msg);
 	}
-
-    sprintLog("[ele-ffi] show_win: %d,%x \r\n", show, g_hwnd);
-//    if (!g_hwnd) return false;
-//    PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
+    // if (!g_hwnd) return false;
+    // PostMessage(g_hwnd, WM_SHOW_WIN, (WPARAM)show, 0);
     return true;
 }
 
 DLL_API bool quit_win() {
+	sprintLog("[ele-ffi] quit_win: \r\n");
     MsgStruct msg;
     msg.type = set_exit;
     msgSvr.PostMsg(msg);
-
-    sprintLog("[ele-ffi] quit_win: \r\n");
-    //if (!g_hwnd) return false;
+	//if (!g_hwnd) return false;
     //PostMessage(g_hwnd, WM_DESTROY, 0, 0);
-
-    g_bExit = true;
     return true;
 }
 
-//GetWindowLong(hwnd, GWL_WNDPROC)                  // 获取原窗口处理  
-//SetWindowLong(hwnd, GWL_WNDPROC, MyWindowProc)    // 替换窗口处理
 
 
