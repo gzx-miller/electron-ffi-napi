@@ -30,6 +30,7 @@ struct MsgStruct {
     MsgType type;
 	int x;
 	int y;
+	int h_;
 	int x_;
 	int y_;
 	int w;

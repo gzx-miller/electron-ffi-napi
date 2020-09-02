@@ -37,8 +37,8 @@ function test_ffi_napi() {
     let ffi = require("ffi-napi");
     var ref = require("ref-napi");
     window.ffi_napi = ffi.Library("my_win/release/my_win.dll", {
-      create_win: ["bool", ["int", "int", "int", "int", "int", "int", "int"]],
-      set_win_pos: ["bool", ["int", "int", "int", "int", "int"]],
+      create_win: ["bool", ["int", "int", "int", "int", "int", "int", "int", "int"]],
+      set_win_pos: ["bool", ["int", "int", "int", "int", "int", "int"]],
       set_win_size: ["bool", ["int", "int"]],
       show_win: ["bool", ["int"]],
       quit_win: ["bool", []],
@@ -68,8 +68,8 @@ function observePlayerSize() {
   window.onresize = () =>{  // TestCode: change dom size
     body.style.width = window.innerWidth + "px";
     body.style.height = window.innerHeight + "px";
-    player.style.width = window.innerWidth * 0.8 + "px";
-    player.style.height = window.innerHeight * 0.8 + "px";
+    player.style.width = window.innerWidth * 0.75 + "px";
+    player.style.height = window.innerHeight * 0.75 + "px";
   }
   window.onresize();
 
@@ -80,7 +80,7 @@ function observePlayerSize() {
     scrollTop = container.scrollTop;
     // let x = winLeft + playerX;
     // let y = winTop + playerY - scrollTop;
-    window.ffi_napi.set_win_pos(winLeft, winTop, playerX, playerY, scrollTop);
+    window.ffi_napi.set_win_pos(winLeft, winTop, window.innerHeight, playerX, playerY, scrollTop);
   });
 
   let preWidth = 0, preHeight = 0;
@@ -128,7 +128,7 @@ ipcRenderer.on("window_move", (ev, arg)=>{
   // let x = winLeft + playerX;
   // let y = winTop + playerY - scrollTop;
   // console.log(`on recv window_move: ${x}, ${y}`);
-  window.ffi_napi.set_win_pos(winLeft, winTop, playerX, playerY, scrollTop);
+  window.ffi_napi.set_win_pos(winLeft, winTop, window.innerHeight, playerX, playerY, scrollTop);
 });
 
 function initWin() {
@@ -140,7 +140,7 @@ function initWin() {
   // let y = winTop + playerY - scrollTop;
   // console.log(`initWin: ${x}, ${y}, ${player.clientWidth}, ${player.clientHeight}, ${hwnd}`);
   window.ffi_napi.create_win(
-    winLeft, winTop, 
+    winLeft, winTop, window.innerHeight,
     playerX, playerY, 
     player.clientWidth, player.clientHeight, 
     hwnd);

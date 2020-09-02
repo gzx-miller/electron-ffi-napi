@@ -72,18 +72,38 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL SetWinNewPos(int x, int y, int w, int h) {
 	return SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
 }
+BOOL UpdateWinPos(int winX, int winY, int winH, 
+	int domX, int domY, int domW, int domH, int scrollTop) {
+	if (domY < scrollTop) {
+		SetWinNewPos(winX + domX, winY, domW,
+			max(0, domY + domH - scrollTop));
+	}
+	else if (domY + domH > winH + scrollTop) {
+		SetWinNewPos(winX + domX, winY + domY - scrollTop, domW,
+			max(0, scrollTop + winH - domY));
+	}
+	else {
+		SetWinNewPos(winX + domX, winY + domY - scrollTop, domW, domH);
+	}
+	return TRUE;
+}
 bool g_bExit = false;
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_new_win_pos) {
-        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d \r\n", 
-			msg.type, msg.x, msg.y, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
-		if (msg.x_ >= msg.offset) {
-			SetWinNewPos(msg.x + msg.x_, msg.y + msg.y_ - msg.offset, msg.w, msg.h);
-		}
-		else if (msg.x_ < msg.offset) {
-			SetWinNewPos(msg.x + msg.x_, msg.y, msg.w, 
-				max(0, msg.y_ + msg.h - msg.offset));
-		}
+        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d,%d \r\n", 
+			msg.type, msg.x, msg.y, msg.h_, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
+		UpdateWinPos(msg.x, msg.y, msg.h_, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
+		//if (msg.y_ < msg.offset) {
+		//	SetWinNewPos(msg.x + msg.x_, msg.y, msg.w,
+		//		max(0, msg.y_ + msg.h - msg.offset));
+		//}
+		//else if (msg.y_ + msg.h > pageH + msg.offset) {
+		//	SetWinNewPos(msg.x + msg.x_, msg.y + msg.y_ - msg.offset, msg.w,
+		//		max(0, msg.offset + pageH - msg.y_));
+		//}
+		//else {
+		//	SetWinNewPos(msg.x + msg.x_, msg.y + msg.y_ - msg.offset, msg.w, msg.h);
+		//}
     } else if (msg.type == set_exit) {
         sprintLog("[ele-ffi] MsgClient onRcvMsg set_exit \r\n");
         g_bExit = true;
@@ -105,15 +125,15 @@ void __cdecl threadProc(void*) {
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     char* cmdLine = GetCommandLine();
-    int winX = 0, winY = 0, domX = 0, domY = 0, w = 0, h = 0;
+    int winX = 0, winY = 0, winH = 0, domX = 0, domY = 0, w = 0, h = 0;
     HWND hwnd_eletron = (HWND)0;
     string strCmd(cmdLine);
     int f = strCmd.find(' ');
     string strParams = strCmd.substr(f);
-    sscanf(strParams.c_str(), "%d,%d,%d,%d,%d,%d,%d",
-        &winX, &winY, &domX, &domY, &w, &h, &hwnd_eletron);
-    sprintLog("[ele-ffi] InitInstance: (%d,%d),(%d,%d),[%d,%d], 0x%x \r\n", 
-		winX, winY, domX, domY, w, h, hwnd_eletron);
+    sscanf(strParams.c_str(), "%d,%d,%d, %d,%d,%d,%d,%d",
+        &winX, &winY, &winH, &domX, &domY, &w, &h, &hwnd_eletron);
+    sprintLog("[ele-ffi] InitInstance: (%d,%d,%d),(%d,%d),[%d,%d], 0x%x \r\n", 
+		winX, winY, winH, domX, domY, w, h, hwnd_eletron);
 
     if (hwnd_eletron != NULL) {
         long style = GetWindowLong(hwnd_eletron, GWL_STYLE);
@@ -131,12 +151,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     SetWindowLongPtr(hwnd_eletron, GWLP_HWNDPARENT, (LONG)g_hwnd);
 
     msgClient.Connect(string("player_win"));
-    MsgStruct msg;
-    msg.type = set_win_hwnd;
-    msg.x = (int)g_hwnd;
-    msgClient.PostMsg(msg);
+	MsgStruct msg;
+	msg.type = set_win_hwnd;
+	msg.x = (int)g_hwnd;
+	msgClient.PostMsg(msg);
     
-    SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
+	UpdateWinPos(winX, winY, winH, domX, domY, w, h, 0);
+    //SetWindowPos(g_hwnd, HWND_TOP, x, y, w, h, SWP_SHOWWINDOW);
     ShowWindow(g_hwnd, nCmdShow);
     UpdateWindow(g_hwnd);
     return TRUE;
@@ -149,7 +170,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     MyRegisterClass(hInstance);
     if (!InitInstance(hInstance, nCmdShow)) return FALSE;
 
-    UINT32 threadID;
+    // UINT32 threadID;
     HANDLE hThread = (HANDLE)_beginthread(threadProc, 0, 0);
 
     MSG msg;

@@ -93,18 +93,18 @@ void __cdecl threadProc(void*) {
     if (!msgSvr.Listen("player_win", 2000)) return;
 }
 
-int lastWinX = 0, lastWinY = 0;
+int lastWinX = 0, lastWinY = 0, lastWinH = 0;
 int lastDomX = 0, lastDomY = 0;
 int lastW = 0, lastH = 0;
 int lastScrollTop = 0;
-DLL_API bool create_win(int winX, int winY, int domX, int domY, int w, int h, int hwnd) {
-    lastWinX = winX; lastWinY = winY; 
+DLL_API bool create_win(int winX, int winY, int winH, int domX, int domY, int w, int h, int hwnd) {
+	lastWinX = winX; lastWinY = winY; lastWinH = winH;
 	lastDomX = domX; lastDomY = domY;
 	lastW = w; lastH = h;
-    sprintLog("[ele-ffi] create_win: (%d,%d),(%d,%d),[%d,%d],%x \r\n",
-		winX, winY, domX, domY, w, h, hwnd);
+    sprintLog("[ele-ffi] create_win: (%d,%d,%d),(%d,%d),[%d,%d],%x \r\n",
+		winX, winY, winH, domX, domY, w, h, hwnd);
     ostringstream ostr;
-    ostr << winX << "," << winY << "," << domX << "," << domY << "," 
+    ostr << winX << "," << winY << "," << winH << "," << domX << "," << domY << "," 
 		 << w << "," << h << ',' << hwnd;
 
     SHELLEXECUTEINFO ShExecInfo;
@@ -126,17 +126,18 @@ DLL_API bool create_win(int winX, int winY, int domX, int domY, int w, int h, in
     return true;
 }
 
-DLL_API bool set_win_pos(int winX, int winY, int domX, int domY, int scrollTop) {
-	lastWinX = winX; lastWinY = winY;
+DLL_API bool set_win_pos(int winX, int winY, int winH, int domX, int domY, int scrollTop) {
+	lastWinX = winX; lastWinY = winY; lastWinH = winH;
 	lastDomX = domX; lastDomY = domY;
 	lastScrollTop = scrollTop;
-	sprintLog("[ele-ffi] set_win_pos: (%d,%d),(%d,%d),%d,%x \r\n",
-		winX, winY, domX, domY, scrollTop, g_hwnd);
+	sprintLog("[ele-ffi] set_win_pos: (%d,%d,%d),(%d,%d),%d,%x \r\n",
+		winX, winY, winH, domX, domY, scrollTop, g_hwnd);
 
     MsgStruct msg;
     msg.type = set_new_win_pos;
     msg.x = lastWinX; 
 	msg.y = lastWinY;
+	msg.h_ = lastWinH;
 	msg.x_ = lastDomX;
 	msg.y_ = lastDomY;
     msg.w = lastW;
@@ -158,6 +159,7 @@ DLL_API bool set_win_size(int w, int h) {
     msg.type = set_new_win_pos;
 	msg.x = lastWinX;
 	msg.y = lastWinY;
+	msg.h_ = lastWinH;
 	msg.x_ = lastDomX;
 	msg.y_ = lastDomY;
 	msg.w = lastW;
