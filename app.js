@@ -68,8 +68,8 @@ function observePlayerSize() {
   window.onresize = () =>{  // TestCode: change dom size
     body.style.width = window.innerWidth + "px";
     body.style.height = window.innerHeight + "px";
-    player.style.width = window.innerWidth * 0.75 + "px";
-    player.style.height = window.innerHeight * 0.75 + "px";
+    // player.style.width = window.innerWidth * 0.75 + "px";
+    // player.style.height = window.innerHeight * 0.75 + "px";
   }
   window.onresize();
 

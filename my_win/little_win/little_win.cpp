@@ -90,7 +90,7 @@ BOOL UpdateWinPos(int winX, int winY, int winH,
 bool g_bExit = false;
 bool onRcvMsg(MsgStruct & msg) {
     if(msg.type == set_new_win_pos) {
-        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,%d,%d,%d,%d,%d \r\n", 
+        sprintLog("[ele-ffi] MsgClient onRcvMsg set_new_win_pos: %d,(%d,%d,%d),(%d,%d),[%d,%d],%d \r\n", 
 			msg.type, msg.x, msg.y, msg.h_, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
 		UpdateWinPos(msg.x, msg.y, msg.h_, msg.x_, msg.y_, msg.w, msg.h, msg.offset);
 		//if (msg.y_ < msg.offset) {

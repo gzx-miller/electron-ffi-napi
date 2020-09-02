@@ -18,12 +18,22 @@ body {
     position: relative;
     margin: 20px;
     background: #2ecc717f;
+    margin: 40px;
+    width: 400px;
+    height: 300px;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: #0000ff;
 }
 
 .blank {
     position: relative;
     margin: 40px;
-    height: 60%;
+    width: 400px;
+    height: 300px;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: #cccccc;
 }
 
 .header {
