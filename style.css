@@ -1,7 +1,7 @@
 body {
     position: relative;
     margin: 0;
-    background: #e6e6e67f;
+    background: #9999997f;
     overflow: hidden;
 }
 
@@ -17,7 +17,7 @@ body {
 .player {
     position: relative;
     margin: 20px;
-    background: #2ecc717f;
+    background: #00ff0033;
     margin: 40px;
     width: 400px;
     height: 300px;
