@@ -70,6 +70,7 @@ function observePlayerSize() {
     body.style.height = window.innerHeight + "px";
     // player.style.width = window.innerWidth * 0.75 + "px";
     // player.style.height = window.innerHeight * 0.75 + "px";
+    window.ffi_napi.set_win_pos(winLeft, winTop, window.innerHeight, playerX, playerY, scrollTop);
   }
   window.onresize();
 
@@ -83,26 +84,26 @@ function observePlayerSize() {
     window.ffi_napi.set_win_pos(winLeft, winTop, window.innerHeight, playerX, playerY, scrollTop);
   });
 
-  let preWidth = 0, preHeight = 0;
-  var observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (player.clientWidth != preWidth || 
-          player.clientHeight != preHeight) {
-          preWidth = player.clientWidth;
-          preHeight = player.clientHeight;
-          console.log(`mutation: ${player.clientWidth}, ${player.clientHeight}`);
-          window.ffi_napi.set_win_size(player.clientWidth, player.clientHeight);
-      }
-    });
-  });
-  var config = {
-    attributes: true,
-    subtree: false,
-    childList: false,
-    attributeOldValue: true,
-    attributeFilter: ["style"],
-  };
-  observer.observe(player, config);
+  // let preWidth = 0, preHeight = 0;
+  // var observer = new MutationObserver(function (mutations) {
+  //   mutations.forEach(function (mutation) {
+  //     if (player.clientWidth != preWidth || 
+  //         player.clientHeight != preHeight) {
+  //         preWidth = player.clientWidth;
+  //         preHeight = player.clientHeight;
+  //         console.log(`mutation: ${player.clientWidth}, ${player.clientHeight}`);
+  //         window.ffi_napi.set_win_size(player.clientWidth, player.clientHeight);
+  //     }
+  //   });
+  // });
+  // var config = {
+  //   attributes: true,
+  //   subtree: false,
+  //   childList: false,
+  //   attributeOldValue: true,
+  //   attributeFilter: ["style"],
+  // };
+  // observer.observe(player, config);
 }
 
 function regClick() {
