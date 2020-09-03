@@ -62,12 +62,12 @@ function test_ffi_napi() {
   }
 }
 
-function observePlayerSize() {  
+function observePlayerSize() {
   var body = document.getElementsByTagName("body")[0];
-  var player = document.getElementById("player");
   window.onresize = () =>{  // TestCode: change dom size
+    console.log(`${Date.now()}[onresize] winW: ${window.innerWidth}, winH: ${window.innerHeight}`);
     body.style.width = window.innerWidth + "px";
-    body.style.height = window.innerHeight + "px";
+    body.style.height = window.innerHeight + "px"; 
     // player.style.width = window.innerWidth * 0.75 + "px";
     // player.style.height = window.innerHeight * 0.75 + "px";
     window.ffi_napi.set_win_pos(winLeft, winTop, window.innerHeight, playerX, playerY, scrollTop);
@@ -126,6 +126,7 @@ ipcRenderer.on("window_closed", () =>{
 
 ipcRenderer.on("window_move", (ev, arg)=>{
   if (!getWinPos()) return false;
+  console.log(`${Date.now()}[winMove] winX: ${winLeft}, winY: ${winTop}`);
   // let x = winLeft + playerX;
   // let y = winTop + playerY - scrollTop;
   // console.log(`on recv window_move: ${x}, ${y}`);

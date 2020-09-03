@@ -30,7 +30,7 @@ function createWindow () {
     slashes: true
   }))
 
-  //mainWin.webContents.openDevTools();
+  // mainWin.webContents.openDevTools();
 
   mainWin.on('closed', () => {
     mainWin = null;
@@ -41,7 +41,7 @@ function createWindow () {
 }
 
 // app.disableDomainBlockingFor3DAPIs();
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
