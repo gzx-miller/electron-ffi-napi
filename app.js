@@ -1,4 +1,4 @@
-const { ipcRenderer, BrowserWindow } = require('electron');
+const { ipcRenderer } = require('electron');
 
 let playerX = 0;
 let playerY = 0;
